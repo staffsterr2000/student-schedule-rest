@@ -5,22 +5,27 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
-public class Student {
+public class Course {
 
+    public enum Subject {
+        HISTORY,
+        MATH,
+        ENGLISH
+    }
 
     /**
      * Name for the DB sequence
      */
-    private static final String SEQUENCE_NAME = "student_sequence";
+    private static final String SEQUENCE_NAME = "course_sequence";
+
 
 
     /**
-     * Student's ID
+     * Course's ID
      */
     @Id
     @SequenceGenerator(
@@ -35,12 +40,10 @@ public class Student {
     private Long id;
 
     @NotNull
-    private String firstName;
+    @Enumerated(EnumType.STRING)
+    private Subject subject;
 
     @NotNull
-    private String lastName;
-
-    @ElementCollection
-    private List<Course> courses;
+    private String teacher;
 
 }
