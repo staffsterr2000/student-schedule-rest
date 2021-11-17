@@ -11,7 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 public class CourseService {
 
-
     private final CourseRepo courseRepository;
 
 
@@ -22,4 +21,5 @@ public class CourseService {
     public List<Course> getCourses() {
         return courseRepository.findAll();
     }
+
 }

@@ -1,8 +1,10 @@
 package com.staffsterr2000.studentschedulerest.controller;
 
 import com.staffsterr2000.studentschedulerest.entity.Course;
+import com.staffsterr2000.studentschedulerest.entity.Lecture;
 import com.staffsterr2000.studentschedulerest.entity.Student;
 import com.staffsterr2000.studentschedulerest.model.service.CourseService;
+import com.staffsterr2000.studentschedulerest.model.service.LectureService;
 import com.staffsterr2000.studentschedulerest.model.service.StudentService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +23,8 @@ public class HomeController {
 
     private final CourseService courseService;
 
+    private final LectureService lectureService;
+
 
     @GetMapping("/students")
     public List<Student> getStudents() {
@@ -32,5 +36,9 @@ public class HomeController {
         return courseService.getCourses();
     }
 
+    @GetMapping("/lectures")
+    public List<Lecture> getLectures() {
+        return lectureService.getLectures();
+    }
 
 }
