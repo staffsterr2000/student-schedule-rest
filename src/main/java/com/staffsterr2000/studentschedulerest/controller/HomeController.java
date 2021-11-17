@@ -8,6 +8,7 @@ import com.staffsterr2000.studentschedulerest.model.service.LectureService;
 import com.staffsterr2000.studentschedulerest.model.service.StudentService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -25,6 +26,10 @@ public class HomeController {
 
     private final LectureService lectureService;
 
+    @GetMapping("/student/{id}")
+    public Student getStudent(@PathVariable("id") Long id) {
+        return studentService.getStudent(id);
+    }
 
     @GetMapping("/students")
     public List<Student> getStudents() {

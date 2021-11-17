@@ -1,8 +1,8 @@
 package com.staffsterr2000.studentschedulerest.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
@@ -10,6 +10,8 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
+@ToString(exclude = {"students"})
+@EqualsAndHashCode(exclude = {"students"})
 public class Course {
 
     public enum Subject {
@@ -47,7 +49,15 @@ public class Course {
     @NotNull
     private String teacher;
 
-    @ElementCollection
+    @OneToMany
+    @JoinColumn(
+            name = "course_id",
+            foreignKey = @ForeignKey(name="FK_COURSE")
+    )
     private List<Lecture> lectures;
+
+    @ManyToMany(mappedBy = "courses")
+    @JsonIgnore
+    private List<Student> students;
 
 }

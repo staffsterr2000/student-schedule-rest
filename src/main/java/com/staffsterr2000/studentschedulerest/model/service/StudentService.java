@@ -21,4 +21,8 @@ public class StudentService {
     public void addStudent(Student student) {
         studentRepository.save(student);
     }
+
+    public Student getStudent(Long id) {
+        return studentRepository.findById(id).orElseThrow(() -> new IllegalStateException("No such ID."));
+    }
 }
