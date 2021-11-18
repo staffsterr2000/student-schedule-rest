@@ -14,7 +14,7 @@ public class CourseService {
     private final CourseRepo courseRepository;
 
 
-    public void addCourse(Course course) {
+    public void createCourse(Course course) {
         courseRepository.save(course);
     }
 

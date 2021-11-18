@@ -1,31 +1,26 @@
 package com.staffsterr2000.studentschedulerest.entity;
 
 import com.sun.istack.NotNull;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
-public class Course {
+public class Audience {
 
-    public enum Subject {
-        HISTORY,
-        MATH,
-        ENGLISH
-    }
 
     /**
      * Name for the DB sequence
      */
-    private static final String SEQUENCE_NAME = "course_sequence";
-
+    private static final String SEQUENCE_NAME = "audience_sequence";
 
 
     /**
-     * Course's ID
+     * Audience's ID
      */
     @Id
     @SequenceGenerator(
@@ -37,19 +32,10 @@ public class Course {
             strategy = GenerationType.SEQUENCE,
             generator = SEQUENCE_NAME
     )
+    @EqualsAndHashCode.Exclude
     private Long id;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
-    private Subject subject;
-
-    @NotNull
-    private String teacherFullName;
-
-    @OneToMany(mappedBy = "course")
-    private List<Lecture> lectures;
-
-    @ManyToMany(mappedBy = "courses")
-    private List<StudentGroup> studentGroups;
+    private Integer roomNumber;
 
 }

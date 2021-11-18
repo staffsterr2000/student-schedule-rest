@@ -43,6 +43,14 @@ public class Lecture {
     )
     private Course course;
 
+    @ManyToOne
+    @JoinColumn(
+            nullable = false,
+            name = "audience_id",
+            foreignKey = @ForeignKey(name="FK_AUDIENCE")
+    )
+    private Audience audience;
+
     @NotNull
     private LocalDate localDate;
 

@@ -1,10 +1,10 @@
 package com.staffsterr2000.studentschedulerest.entity;
 
 import com.sun.istack.NotNull;
-import lombok.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Data
@@ -39,12 +39,12 @@ public class Student {
     @NotNull
     private String lastName;
 
-    @ManyToMany
-    @JoinTable(
-            name = "student_course",
-            joinColumns = @JoinColumn(name = "student_id", foreignKey = @ForeignKey(name = "FK_COURSE_STUDENT")),
-            inverseJoinColumns = @JoinColumn(name = "course_id", foreignKey = @ForeignKey(name = "FK_STUDENT_COURSE"))
+    @ManyToOne
+    @JoinColumn(
+            nullable = false,
+            name = "sgroup_id",
+            foreignKey = @ForeignKey(name = "FK_SGROUP")
     )
-    private List<Course> courses;
+    private StudentGroup studentGroup;
 
 }

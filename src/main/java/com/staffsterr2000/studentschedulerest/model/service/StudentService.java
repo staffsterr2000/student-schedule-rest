@@ -1,6 +1,5 @@
 package com.staffsterr2000.studentschedulerest.model.service;
 
-import com.staffsterr2000.studentschedulerest.entity.Course;
 import com.staffsterr2000.studentschedulerest.entity.Lecture;
 import com.staffsterr2000.studentschedulerest.entity.Student;
 import com.staffsterr2000.studentschedulerest.model.repo.StudentRepo;
@@ -22,7 +21,7 @@ public class StudentService {
         return studentRepository.findAll();
     }
 
-    public void addStudent(Student student) {
+    public void createStudent(Student student) {
         studentRepository.save(student);
     }
 
@@ -32,7 +31,7 @@ public class StudentService {
     }
 
     public List<Lecture> getStudentLecturesByDate(Student student, LocalDate date) {
-        return student.getCourses().stream()
+        return student.getStudentGroup().getCourses().stream()
                 .flatMap(course -> course.getLectures().stream())
                 .filter(lecture -> lecture.getLocalDate().isEqual(date))
                 .collect(Collectors.toList());

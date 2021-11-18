@@ -18,7 +18,7 @@ public class LectureService {
         return lectureRepository.findAll();
     }
 
-    public void addLecture(Lecture lecture) {
+    public void createLecture(Lecture lecture) {
         lectureRepository.save(lecture);
     }
 
