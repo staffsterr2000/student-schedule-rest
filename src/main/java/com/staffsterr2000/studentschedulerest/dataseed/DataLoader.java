@@ -26,30 +26,37 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        // lecture 1
-        Lecture lecture1 = new Lecture();
-        lecture1.setLocalDate(LocalDate.now().plusDays(1));
-        lectureService.addLecture(lecture1);
-
-        // lecture 2
-        Lecture lecture2 = new Lecture();
-        lecture2.setLocalDate(LocalDate.now().plusDays(2));
-        lectureService.addLecture(lecture2);
-
-
         // course 1
         Course course1 = new Course();
         course1.setSubject(Course.Subject.HISTORY);
-        course1.setTeacher("Hans Renson");
-        course1.setLectures(List.of(lecture1, lecture2));
+        course1.setTeacherFullName("Hans Renson");
         courseService.addCourse(course1);
 
         // course 2
         Course course2 = new Course();
         course2.setSubject(Course.Subject.MATH);
-        course2.setTeacher("Another Teacher");
-        course2.setLectures(List.of(lecture1));
+        course2.setTeacherFullName("Another Teacher");
         courseService.addCourse(course2);
+
+
+
+        // lecture 1
+        Lecture lecture1 = new Lecture();
+        lecture1.setCourse(course1);
+        lecture1.setLocalDate(LocalDate.now().plusDays(1));
+        lectureService.addLecture(lecture1);
+
+        // lecture 2
+        Lecture lecture2 = new Lecture();
+        lecture2.setCourse(course2);
+        lecture2.setLocalDate(LocalDate.now().plusDays(2));
+        lectureService.addLecture(lecture2);
+
+        Lecture lecture3 = new Lecture();
+        lecture3.setCourse(course1);
+        lecture3.setLocalDate(LocalDate.now().plusDays(2));
+        lectureService.addLecture(lecture3);
+
 
 
         // student 1

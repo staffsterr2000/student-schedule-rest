@@ -47,17 +47,12 @@ public class Course {
     private Subject subject;
 
     @NotNull
-    private String teacher;
+    private String teacherFullName;
 
-    @OneToMany
-    @JoinColumn(
-            name = "course_id",
-            foreignKey = @ForeignKey(name="FK_COURSE")
-    )
+    @OneToMany(mappedBy = "course")
     private List<Lecture> lectures;
 
     @ManyToMany(mappedBy = "courses")
-    @JsonIgnore
     private List<Student> students;
 
 }

@@ -42,8 +42,8 @@ public class Student {
     @ManyToMany
     @JoinTable(
             name = "student_course",
-            joinColumns = @JoinColumn(name = "student_id"),
-            inverseJoinColumns = @JoinColumn(name = "course_id")
+            joinColumns = @JoinColumn(name = "student_id", foreignKey = @ForeignKey(name = "FK_COURSE_STUDENT")),
+            inverseJoinColumns = @JoinColumn(name = "course_id", foreignKey = @ForeignKey(name = "FK_STUDENT_COURSE"))
     )
     private List<Course> courses;
 

@@ -1,5 +1,6 @@
 package com.staffsterr2000.studentschedulerest.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,6 +34,14 @@ public class Lecture {
             generator = SEQUENCE_NAME
     )
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(
+            nullable = false,
+            name = "course_id",
+            foreignKey = @ForeignKey(name="FK_COURSE")
+    )
+    private Course course;
 
     @NotNull
     private LocalDate localDate;
