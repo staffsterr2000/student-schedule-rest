@@ -21,7 +21,7 @@ public class DataLoader implements CommandLineRunner {
 
     private final LectureService lectureService;
 
-    private final GroupService groupService;
+    private final StudentGroupService studentGroupService;
 
     private final AudienceService audienceService;
 
@@ -127,17 +127,17 @@ public class DataLoader implements CommandLineRunner {
         StudentGroup studentGroupKN17 = new StudentGroup();
         studentGroupKN17.setName("KN17");
         studentGroupKN17.setCourses(List.of(courseHistory, courseEnglish2));
-        groupService.createGroup(studentGroupKN17);
+        studentGroupService.createGroup(studentGroupKN17);
 
         StudentGroup studentGroupSA17 = new StudentGroup();
         studentGroupSA17.setName("SA17");
         studentGroupSA17.setCourses(List.of(courseHistory, courseMath));
-        groupService.createGroup(studentGroupSA17);
+        studentGroupService.createGroup(studentGroupSA17);
 
         StudentGroup studentGroupAPP17 = new StudentGroup();
         studentGroupAPP17.setName("APP17");
         studentGroupAPP17.setCourses(List.of(courseMath, courseEnglish1));
-        groupService.createGroup(studentGroupAPP17);
+        studentGroupService.createGroup(studentGroupAPP17);
 
 
 

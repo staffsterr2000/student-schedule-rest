@@ -16,4 +16,10 @@ public class LectureDto {
     @JsonProperty("date")
     private LocalDate date;
 
+    @JsonProperty("room")
+    private Integer roomNumber;
+
+//    @JsonProperty("audience")
+//    private AudienceDto audience;
+
 }

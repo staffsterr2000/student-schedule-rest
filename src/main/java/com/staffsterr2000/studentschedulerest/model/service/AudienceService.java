@@ -1,70 +1,76 @@
 package com.staffsterr2000.studentschedulerest.model.service;
 
+import com.staffsterr2000.studentschedulerest.dto.AudienceDto;
 import com.staffsterr2000.studentschedulerest.entity.Audience;
 import com.staffsterr2000.studentschedulerest.model.repo.AudienceRepo;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class AudienceService {
 
-
     private final AudienceRepo audienceRepository;
+    private final ModelMapper modelMapper;
 
 
-    public Audience getAudienceById(Long id) {
-        return audienceRepository.findById(id).
+    public AudienceDto getAudienceById(Long id) {
+        Audience audienceById = audienceRepository.findById(id).
                 orElseThrow(() -> new IllegalStateException(String.format("No such auditory with %d id.", id)));
+        return convertToAudienceDto(audienceById);
     }
 
-    public Audience getAudienceByRoomNumber(Integer roomNumber) {
-        return audienceRepository.findByRoomNumber(roomNumber).
+    public AudienceDto getAudienceByRoomNumber(Integer roomNumber) {
+        Audience audienceByRoomNumber = audienceRepository.findByRoomNumber(roomNumber).
                 orElseThrow(() -> new IllegalStateException(String.format("No such auditory with %d room number.", roomNumber)));
+        return convertToAudienceDto(audienceByRoomNumber);
     }
 
-    public List<Audience> getAudiences() {
-        return audienceRepository.findAll();
+    public List<AudienceDto> getAudiences() {
+        return audienceRepository.findAll().stream()
+                .map(this::convertToAudienceDto)
+                .collect(Collectors.toList());
     }
 
-    @SuppressWarnings("UnusedReturnValue")
-    public boolean createAudience(Audience audience) {
-        boolean audienceIsAbsent = getAudiences().stream()
-                .filter(a -> a.equals(audience))
-                .findAny()
-                .isEmpty();
+    public void createAudience(Audience audience) {
+        Integer audienceRoomNumber = audience.getRoomNumber();
+        boolean audienceExists = audienceRepository
+                .findByRoomNumber(audienceRoomNumber).isPresent();
 
-        if (audienceIsAbsent)
-            audienceRepository.save(audience);
-
-        return audienceIsAbsent;
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    public boolean updateAudience(Long id, Audience audience) {
-        boolean audienceIsPresent =
-                audienceRepository.existsById(id);
-
-        if (audienceIsPresent) {
-            audience.setId(id);
-            audienceRepository.save(audience);
+        if (audienceExists) {
+            throw new IllegalStateException(
+                    String.format("Audience with room number %d already exists", audienceRoomNumber)
+            );
         }
 
-        return audienceIsPresent;
+        audienceRepository.save(audience);
     }
 
-    @SuppressWarnings("UnusedReturnValue")
-    public boolean deleteAudience(Long id) {
-        boolean audienceIsPresent =
-                audienceRepository.existsById(id);
+//    public void updateAudience(Long audienceId, Audience modifiedAudience) {
+//        boolean audienceExists =
+//                audienceRepository.existsById(audienceId);
+//
+//        if (audienceExists) {
+//            modifiedAudience.setId(audienceId);
+//            audienceRepository.save(modifiedAudience);
+//        }
+//    }
+//
+//    public void deleteAudience(Long audienceId) {
+//        boolean audienceExists =
+//                audienceRepository.existsById(audienceId);
+//
+//        if (audienceExists) {
+//            audienceRepository.deleteById(audienceId);
+//        }
+//    }
 
-        if (audienceIsPresent) {
-            audienceRepository.deleteById(id);
-        }
-
-        return audienceIsPresent;
+    private AudienceDto convertToAudienceDto(Audience audience) {
+        return modelMapper.map(audience, AudienceDto.class);
     }
 
 }
