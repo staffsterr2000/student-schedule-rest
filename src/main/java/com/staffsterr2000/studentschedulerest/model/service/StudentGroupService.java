@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,11 +29,31 @@ public class StudentGroupService {
                 .collect(Collectors.toList());
     }
 
-    public void createGroup(StudentGroup studentGroup) {
+    // raw create
+    @Transactional
+    public void createGroup(StudentGroupDto studentGroupDto) {
+        StudentGroup studentGroup = convertToStudentGroup(studentGroupDto);
         studentGroupRepository.save(studentGroup);
+    }
+
+    @Transactional
+    public void deleteStudentGroup(Long studentGroupId) {
+        boolean studentGroupExists =
+                studentGroupRepository.existsById(studentGroupId);
+
+        if (!studentGroupExists) {
+            throw new IllegalStateException(String.format("Student group with id %d doesn't exist", studentGroupId));
+        }
+
+        studentGroupRepository.deleteById(studentGroupId);
     }
 
     private StudentGroupDto convertToStudentGroupDto(StudentGroup studentGroup) {
         return modelMapper.map(studentGroup, StudentGroupDto.class);
     }
+
+    private StudentGroup convertToStudentGroup(StudentGroupDto studentGroupDto) {
+        return modelMapper.map(studentGroupDto, StudentGroup.class);
+    }
+
 }

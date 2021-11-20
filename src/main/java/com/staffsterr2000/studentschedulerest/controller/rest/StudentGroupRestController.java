@@ -1,4 +1,4 @@
-package com.staffsterr2000.studentschedulerest.controller;
+package com.staffsterr2000.studentschedulerest.controller.rest;
 
 import com.staffsterr2000.studentschedulerest.dto.StudentGroupDto;
 import com.staffsterr2000.studentschedulerest.model.service.StudentGroupService;
@@ -24,6 +24,16 @@ public class StudentGroupRestController {
     @ResponseBody
     public List<StudentGroupDto> getStudentGroups() {
         return studentGroupService.getStudentGroups();
+    }
+
+    @PostMapping
+    public void createStudentGroup(@RequestBody StudentGroupDto studentGroup) {
+        studentGroupService.createGroup(studentGroup);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteStudentGroup(@PathVariable("id") Long studentGroupId) {
+        studentGroupService.deleteStudentGroup(studentGroupId);
     }
 
 }

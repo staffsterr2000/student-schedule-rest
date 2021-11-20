@@ -1,5 +1,6 @@
 package com.staffsterr2000.studentschedulerest.dataseed;
 
+import com.staffsterr2000.studentschedulerest.dto.*;
 import com.staffsterr2000.studentschedulerest.entity.*;
 import com.staffsterr2000.studentschedulerest.model.service.*;
 import lombok.AllArgsConstructor;
@@ -29,155 +30,166 @@ public class DataLoader implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
         // audiences
-        Audience audience112 = new Audience();
+        AudienceDto audience112 = new AudienceDto();
         audience112.setRoomNumber(112);
-        audienceService.createAudience(audience112);
+        Long audience112Id = audienceService
+                .createAudience(audience112);
 
-        Audience audience203 = new Audience();
+        AudienceDto audience203 = new AudienceDto();
         audience203.setRoomNumber(203);
-        audienceService.createAudience(audience203);
+        Long audience203Id = audienceService
+                .createAudience(audience203);
 
-        Audience audience309 = new Audience();
+        AudienceDto audience309 = new AudienceDto();
         audience309.setRoomNumber(309);
-        audienceService.createAudience(audience309);
+        Long audience309Id = audienceService
+                .createAudience(audience309);
 
 
 
         // courses
-        Course courseHistory = new Course();
+        CourseDto courseHistory = new CourseDto();
         courseHistory.setSubject(HISTORY);
         courseHistory.setTeacherFullName("Hans Renson");
-        courseService.createCourse(courseHistory);
 
-        Course courseMath = new Course();
+        CourseDto courseMath = new CourseDto();
         courseMath.setSubject(MATH);
         courseMath.setTeacherFullName("Another Teacher");
-        courseService.createCourse(courseMath);
 
-        Course courseEnglish1 = new Course();
+        CourseDto courseEnglish1 = new CourseDto();
         courseEnglish1.setSubject(ENGLISH);
         courseEnglish1.setTeacherFullName("Galina Ivanovna");
-        courseService.createCourse(courseEnglish1);
 
-        Course courseEnglish2 = new Course();
+        CourseDto courseEnglish2 = new CourseDto();
         courseEnglish2.setSubject(ENGLISH);
         courseEnglish2.setTeacherFullName("Jack Rachel");
-        courseService.createCourse(courseEnglish2);
 
 
 
         // lectures
-        Lecture lecture1 = new Lecture();
-        lecture1.setCourse(courseHistory);
-        lecture1.setAudience(audience112);
+        LectureDto lecture1 = new LectureDto();
+//        lecture1.setCourseId(courseHistory);
+        lecture1.setAudienceId(audience112Id);
         lecture1.setLocalDate(LocalDate.now().plusDays(1));
-        lectureService.createLecture(lecture1);
 
-        Lecture lecture2 = new Lecture();
-        lecture2.setCourse(courseHistory);
-        lecture2.setAudience(audience203);
+        LectureDto lecture2 = new LectureDto();
+//        lecture2.setCourse(courseHistory);
+//        lecture2.setAudience(audience203);
         lecture2.setLocalDate(LocalDate.now().plusDays(2));
-        lectureService.createLecture(lecture2);
 
-        Lecture lecture3 = new Lecture();
-        lecture3.setCourse(courseHistory);
-        lecture3.setAudience(audience112);
+        LectureDto lecture3 = new LectureDto();
+//        lecture3.setCourse(courseHistory);
+//        lecture3.setAudience(audience112);
         lecture3.setLocalDate(LocalDate.now().plusDays(3));
-        lectureService.createLecture(lecture3);
 
-        Lecture lecture4 = new Lecture();
-        lecture4.setCourse(courseEnglish2);
-        lecture4.setAudience(audience203);
+        LectureDto lecture4 = new LectureDto();
+//        lecture4.setCourse(courseEnglish2);
+//        lecture4.setAudience(audience203);
         lecture4.setLocalDate(LocalDate.now().plusDays(1));
-        lectureService.createLecture(lecture4);
 
-        Lecture lecture5 = new Lecture();
-        lecture5.setCourse(courseEnglish1);
-        lecture5.setAudience(audience112);
+        LectureDto lecture5 = new LectureDto();
+//        lecture5.setCourse(courseEnglish1);
+//        lecture5.setAudience(audience112);
         lecture5.setLocalDate(LocalDate.now().plusDays(2));
-        lectureService.createLecture(lecture5);
 
-        Lecture lecture6 = new Lecture();
-        lecture6.setCourse(courseMath);
-        lecture6.setAudience(audience309);
+        LectureDto lecture6 = new LectureDto();
+//        lecture6.setCourse(courseMath);
+//        lecture6.setAudience(audience309);
         lecture6.setLocalDate(LocalDate.now().plusDays(2));
-        lectureService.createLecture(lecture6);
 
-        Lecture lecture7 = new Lecture();
-        lecture7.setCourse(courseMath);
-        lecture7.setAudience(audience309);
+        LectureDto lecture7 = new LectureDto();
+//        lecture7.setCourse(courseMath);
+//        lecture7.setAudience(audience309);
         lecture7.setLocalDate(LocalDate.now().plusDays(3));
-        lectureService.createLecture(lecture7);
 
-        Lecture lecture8 = new Lecture();
-        lecture8.setCourse(courseMath);
-        lecture8.setAudience(audience309);
+        LectureDto lecture8 = new LectureDto();
+//        lecture8.setCourse(courseMath);
+//        lecture8.setAudience(audience309);
         lecture8.setLocalDate(LocalDate.now().plusDays(3));
-        lectureService.createLecture(lecture8);
 
-        Lecture lecture9 = new Lecture();
-        lecture9.setCourse(courseEnglish1);
-        lecture9.setAudience(audience309);
+        LectureDto lecture9 = new LectureDto();
+//        lecture9.setCourse(courseEnglish1);
+//        lecture9.setAudience(audience309);
         lecture9.setLocalDate(LocalDate.now().plusDays(1));
-        lectureService.createLecture(lecture9);
 
 
 
         // groups
-        StudentGroup studentGroupKN17 = new StudentGroup();
+        StudentGroupDto studentGroupKN17 = new StudentGroupDto();
         studentGroupKN17.setName("KN17");
-        studentGroupKN17.setCourses(List.of(courseHistory, courseEnglish2));
-        studentGroupService.createGroup(studentGroupKN17);
+//        studentGroupKN17.addCourse(courseHistory);
+//        studentGroupKN17.addCourse(courseEnglish2);
 
-        StudentGroup studentGroupSA17 = new StudentGroup();
+        StudentGroupDto studentGroupSA17 = new StudentGroupDto();
         studentGroupSA17.setName("SA17");
-        studentGroupSA17.setCourses(List.of(courseHistory, courseMath));
-        studentGroupService.createGroup(studentGroupSA17);
+//        studentGroupSA17.addCourse(courseHistory);
+//        studentGroupSA17.addCourse(courseMath);
 
-        StudentGroup studentGroupAPP17 = new StudentGroup();
+        StudentGroupDto studentGroupAPP17 = new StudentGroupDto();
         studentGroupAPP17.setName("APP17");
-        studentGroupAPP17.setCourses(List.of(courseMath, courseEnglish1));
-        studentGroupService.createGroup(studentGroupAPP17);
+//        studentGroupAPP17.addCourse(courseMath);
+//        studentGroupAPP17.addCourse(courseEnglish1);
 
 
 
         // students
-        Student student1 = new Student();
+        StudentDto student1 = new StudentDto();
         student1.setFirstName("Stas");
         student1.setLastName("Rock");
-        student1.setStudentGroup(studentGroupKN17);
-        studentService.createStudent(student1);
+//        student1.setStudentGroup(studentGroupKN17);
 
-        Student student2 = new Student();
+        StudentDto student2 = new StudentDto();
         student2.setFirstName("Roma");
         student2.setLastName("Kco");
-        student2.setStudentGroup(studentGroupKN17);
-        studentService.createStudent(student2);
+//        student2.setStudentGroup(studentGroupKN17);
 
-        Student student3 = new Student();
+        StudentDto student3 = new StudentDto();
         student3.setFirstName("Katya");
         student3.setLastName("Kiwuk");
-        student3.setStudentGroup(studentGroupKN17);
-        studentService.createStudent(student3);
+//        student3.setStudentGroup(studentGroupKN17);
 
-        Student student4 = new Student();
+        StudentDto student4 = new StudentDto();
         student4.setFirstName("Nastya");
         student4.setLastName("IsQueen");
-        student4.setStudentGroup(studentGroupSA17);
-        studentService.createStudent(student4);
+//        student4.setStudentGroup(studentGroupSA17);
 
-        Student student5 = new Student();
+        StudentDto student5 = new StudentDto();
         student5.setFirstName("Sonya");
         student5.setLastName("Kombat");
-        student5.setStudentGroup(studentGroupAPP17);
-        studentService.createStudent(student5);
+//        student5.setStudentGroup(studentGroupAPP17);
 
-        Student student6 = new Student();
+        StudentDto student6 = new StudentDto();
         student6.setFirstName("Masha");
         student6.setLastName("Mishina");
-        student6.setStudentGroup(studentGroupAPP17);
-        studentService.createStudent(student6);
+//        student6.setStudentGroup(studentGroupAPP17);
 
+
+
+        courseService.createCourse(courseHistory);
+        courseService.createCourse(courseMath);
+        courseService.createCourse(courseEnglish1);
+        courseService.createCourse(courseEnglish2);
+
+        lectureService.createLecture(lecture1);
+        lectureService.createLecture(lecture2);
+        lectureService.createLecture(lecture3);
+        lectureService.createLecture(lecture4);
+        lectureService.createLecture(lecture5);
+        lectureService.createLecture(lecture6);
+        lectureService.createLecture(lecture7);
+        lectureService.createLecture(lecture8);
+        lectureService.createLecture(lecture9);
+
+        studentGroupService.createGroup(studentGroupKN17);
+        studentGroupService.createGroup(studentGroupSA17);
+        studentGroupService.createGroup(studentGroupAPP17);
+
+        studentService.createStudent(student1);
+        studentService.createStudent(student2);
+        studentService.createStudent(student3);
+        studentService.createStudent(student4);
+        studentService.createStudent(student5);
+        studentService.createStudent(student6);
     }
 
 }

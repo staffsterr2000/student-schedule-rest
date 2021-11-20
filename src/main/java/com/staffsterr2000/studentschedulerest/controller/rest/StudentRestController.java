@@ -1,4 +1,4 @@
-package com.staffsterr2000.studentschedulerest.controller;
+package com.staffsterr2000.studentschedulerest.controller.rest;
 
 import com.staffsterr2000.studentschedulerest.dto.StudentDto;
 import com.staffsterr2000.studentschedulerest.model.service.StudentService;
@@ -26,9 +26,14 @@ public class StudentRestController {
         return studentService.getStudents();
     }
 
-//    @PostMapping
-//    public void createStudent(@RequestBody Student student) {
-//        studentService.createStudent(student);
-//    }
+    @PostMapping
+    public void createStudent(@RequestBody StudentDto student) {
+        studentService.createStudent(student);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteStudent(@PathVariable("id") Long studentId) {
+        studentService.deleteStudent(studentId);
+    }
 
 }

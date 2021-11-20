@@ -8,6 +8,9 @@ import lombok.Setter;
 @Setter
 public class AudienceDto {
 
+    @JsonProperty("id")
+    private Long id;
+
     @JsonProperty("room")
     private Integer roomNumber;
 

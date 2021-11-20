@@ -8,6 +8,9 @@ import lombok.Setter;
 @Setter
 public class StudentDto {
 
+    @JsonProperty("id")
+    private Long studentId;
+
     @JsonProperty("first name")
     private String firstName;
 
@@ -16,5 +19,10 @@ public class StudentDto {
 
     @JsonProperty("sgroup")
     private StudentGroupDto studentGroup;
+
+    public void setStudentGroup(StudentGroupDto studentGroup) {
+        this.studentGroup = studentGroup;
+        studentGroup.getStudents().add(this);
+    }
 
 }

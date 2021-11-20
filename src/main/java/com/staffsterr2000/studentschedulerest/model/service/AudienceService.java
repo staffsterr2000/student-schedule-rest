@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,8 +37,9 @@ public class AudienceService {
                 .collect(Collectors.toList());
     }
 
-    public void createAudience(Audience audience) {
-        Integer audienceRoomNumber = audience.getRoomNumber();
+    @Transactional
+    public Long createAudience(AudienceDto audienceDto) {
+        Integer audienceRoomNumber = audienceDto.getRoomNumber();
         boolean audienceExists = audienceRepository
                 .findByRoomNumber(audienceRoomNumber).isPresent();
 
@@ -47,7 +49,9 @@ public class AudienceService {
             );
         }
 
-        audienceRepository.save(audience);
+        Audience audience = convertToAudience(audienceDto);
+        return audienceRepository.save(audience)
+                .getId();
     }
 
 //    public void updateAudience(Long audienceId, Audience modifiedAudience) {
@@ -59,18 +63,25 @@ public class AudienceService {
 //            audienceRepository.save(modifiedAudience);
 //        }
 //    }
-//
-//    public void deleteAudience(Long audienceId) {
-//        boolean audienceExists =
-//                audienceRepository.existsById(audienceId);
-//
-//        if (audienceExists) {
-//            audienceRepository.deleteById(audienceId);
-//        }
-//    }
+
+    @Transactional
+    public void deleteAudience(Long audienceId) {
+        boolean audienceExists =
+                audienceRepository.existsById(audienceId);
+
+        if (!audienceExists) {
+            throw new IllegalStateException(String.format("Audience with id %d doesn't exist", audienceId));
+        }
+
+        audienceRepository.deleteById(audienceId);
+    }
 
     private AudienceDto convertToAudienceDto(Audience audience) {
         return modelMapper.map(audience, AudienceDto.class);
+    }
+
+    private Audience convertToAudience(AudienceDto audienceDto) {
+        return modelMapper.map(audienceDto, Audience.class);
     }
 
 }

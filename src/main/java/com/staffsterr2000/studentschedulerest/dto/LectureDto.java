@@ -10,16 +10,18 @@ import java.time.LocalDate;
 @Getter
 public class LectureDto {
 
-    @JsonProperty("course")
-    private CourseDto course;
-
     @JsonProperty("date")
-    private LocalDate date;
+    private LocalDate localDate;
 
-    @JsonProperty("room")
-    private Integer roomNumber;
+    @JsonProperty("courseId")
+    private Long courseId;
 
-//    @JsonProperty("audience")
-//    private AudienceDto audience;
+    @JsonProperty("audienceId")
+    private Long audienceId;
+
+//    public void setCourse(CourseDto course) {
+//        this.course = course;
+//        course.getLectures().add(this);
+//    }
 
 }

@@ -1,6 +1,7 @@
-package com.staffsterr2000.studentschedulerest.controller;
+package com.staffsterr2000.studentschedulerest.controller.rest;
 
 import com.staffsterr2000.studentschedulerest.dto.LectureDto;
+import com.staffsterr2000.studentschedulerest.dto.LectureGetDto;
 import com.staffsterr2000.studentschedulerest.model.service.LectureService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,14 +17,24 @@ public class LectureRestController {
 
     @GetMapping("/{id}")
     @ResponseBody
-    public LectureDto getLectureById(@PathVariable("id") Long lectureId) {
+    public LectureGetDto getLectureById(@PathVariable("id") Long lectureId) {
         return lectureService.getLectureById(lectureId);
     }
 
     @GetMapping
     @ResponseBody
-    public List<LectureDto> getLectures() {
+    public List<LectureGetDto> getLectures() {
         return lectureService.getLectures();
+    }
+
+    @PostMapping
+    public void createLecture(@RequestBody LectureDto lecture) {
+        lectureService.createLecture(lecture);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteLecture(@PathVariable("id") Long lectureId) {
+        lectureService.deleteLecture(lectureId);
     }
 
 }

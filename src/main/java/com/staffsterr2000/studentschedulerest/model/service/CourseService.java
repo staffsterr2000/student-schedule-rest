@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,11 +30,33 @@ public class CourseService {
                 .collect(Collectors.toList());
     }
 
-    public void createCourse(Course course) {
+    // raw
+    @Transactional
+    public void createCourse(CourseDto courseDto) {
+        Course course = convertToCourse(courseDto);
         courseRepository.save(course);
     }
+
+    @Transactional
+    public void deleteCourse(Long courseId) {
+        boolean courseExists =
+                courseRepository.existsById(courseId);
+
+        if (!courseExists) {
+            throw new IllegalStateException(String.format("Course with id %d doesn't exist", courseId));
+        }
+
+        courseRepository.deleteById(courseId);
+    }
+
+
 
     private CourseDto convertToCourseDto(Course course) {
         return modelMapper.map(course, CourseDto.class);
     }
+
+    private Course convertToCourse(CourseDto courseDto) {
+        return modelMapper.map(courseDto, Course.class);
+    }
+
 }

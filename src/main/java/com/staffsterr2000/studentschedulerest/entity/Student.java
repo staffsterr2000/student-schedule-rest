@@ -41,7 +41,6 @@ public class Student {
 
     @ManyToOne
     @JoinColumn(
-            nullable = false,
             name = "sgroup_id",
             foreignKey = @ForeignKey(name = "FK_SGROUP")
     )

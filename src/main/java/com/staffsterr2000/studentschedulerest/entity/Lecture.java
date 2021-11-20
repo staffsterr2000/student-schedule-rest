@@ -4,9 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+
+import static org.hibernate.annotations.CascadeType.SAVE_UPDATE;
 
 @Entity
 @Data
@@ -37,7 +40,6 @@ public class Lecture {
 
     @ManyToOne
     @JoinColumn(
-            nullable = false,
             name = "course_id",
             foreignKey = @ForeignKey(name="FK_COURSE")
     )
@@ -45,7 +47,6 @@ public class Lecture {
 
     @ManyToOne
     @JoinColumn(
-            nullable = false,
             name = "audience_id",
             foreignKey = @ForeignKey(name="FK_AUDIENCE")
     )

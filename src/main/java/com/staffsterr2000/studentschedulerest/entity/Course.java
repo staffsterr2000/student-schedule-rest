@@ -2,9 +2,12 @@ package com.staffsterr2000.studentschedulerest.entity;
 
 import com.sun.istack.NotNull;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.util.List;
+
+import static org.hibernate.annotations.CascadeType.ALL;
 
 @Entity
 @Data
