@@ -1,11 +1,14 @@
 package com.staffsterr2000.studentschedulerest.model.service;
 
-import com.staffsterr2000.studentschedulerest.dto.LectureDto;
-import com.staffsterr2000.studentschedulerest.dto.StudentDto;
+import com.staffsterr2000.studentschedulerest.dto.get.LectureGetDto;
+import com.staffsterr2000.studentschedulerest.dto.get.StudentGetDto;
+import com.staffsterr2000.studentschedulerest.dto.get.StudentGroupGetDto;
+import com.staffsterr2000.studentschedulerest.dto.post.StudentPostDto;
 import com.staffsterr2000.studentschedulerest.entity.Student;
 import com.staffsterr2000.studentschedulerest.model.repo.StudentRepo;
-import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -14,31 +17,38 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
 public class StudentService {
 
     private final StudentRepo studentRepository;
-    private final CourseService courseService;
+    private final StudentGroupService studentGroupService;
     private final ModelMapper modelMapper;
 
+    @Autowired
+    public StudentService(StudentRepo studentRepository,
+                          @Lazy StudentGroupService studentGroupService,
+                          ModelMapper modelMapper) {
 
-    public List<StudentDto> getStudents() {
+        this.studentRepository = studentRepository;
+        this.studentGroupService = studentGroupService;
+        this.modelMapper = modelMapper;
+    }
+
+    public List<StudentGetDto> getStudents() {
         return studentRepository.findAll().stream()
                 .map(this::convertToStudentDto)
                 .collect(Collectors.toList());
     }
 
-    public StudentDto getStudentById(Long studentId) {
+    public StudentGetDto getStudentById(Long studentId) {
         Student studentById = studentRepository.findById(studentId)
                 .orElseThrow(() -> new IllegalStateException(String.format("No such student with %d id.", studentId)));
         return convertToStudentDto(studentById);
     }
 
-    // raw
     @Transactional
-    public void createStudent(StudentDto studentDto) {
-        Student student = convertToStudent(studentDto);
-        studentRepository.save(student);
+    public Long createStudent(StudentPostDto studentPostDto) {
+        Student student = convertToStudent(studentPostDto);
+        return studentRepository.save(student).getId();
     }
 
 
@@ -67,18 +77,38 @@ public class StudentService {
         studentRepository.deleteById(studentId);
     }
 
-    public List<LectureDto> getStudentScheduleByDate(StudentDto student, LocalDate date) {
+    public List<LectureGetDto> getStudentScheduleByDate(StudentGetDto student, LocalDate date) {
         return student.getStudentGroup().getCourses().stream()
                 .flatMap(course -> course.getLectures().stream())
                 .filter(lecture -> lecture.getLocalDate().isEqual(date))
                 .collect(Collectors.toList());
     }
 
-    private StudentDto convertToStudentDto(Student student) {
-        return modelMapper.map(student, StudentDto.class);
+    private StudentGetDto convertToStudentDto(Student student) {
+        return modelMapper.map(student, StudentGetDto.class);
     }
 
-    private Student convertToStudent(StudentDto studentDto) {
-        return modelMapper.map(studentDto, Student.class);
+    private Student convertToStudent(StudentPostDto studentPostDto) {
+        StudentGetDto studentGetDto =
+                transformAndFetchAllStudentDataToDto(studentPostDto);
+
+        return modelMapper.map(studentGetDto, Student.class);
+    }
+
+    private StudentGetDto transformAndFetchAllStudentDataToDto(StudentPostDto studentPostDto) {
+        StudentGetDto studentGetDto = new StudentGetDto();
+
+        studentGetDto.setFirstName(studentPostDto.getFirstName());
+        studentGetDto.setLastName(studentPostDto.getLastName());
+
+        Long studentGroupId = studentPostDto.getStudentGroupId();
+        if (studentGroupId != null) {
+            StudentGroupGetDto studentGroupGetDto = studentGroupService
+                    .getStudentGroupById(studentGroupId);
+            studentGetDto.setStudentGroup(studentGroupGetDto);
+//            studentGroupGetDto.getStudents().add(studentGetDto);
+        }
+
+        return studentGetDto;
     }
 }

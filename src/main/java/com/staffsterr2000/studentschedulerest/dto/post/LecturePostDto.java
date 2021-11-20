@@ -1,16 +1,18 @@
-package com.staffsterr2000.studentschedulerest.dto;
+package com.staffsterr2000.studentschedulerest.dto.post;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Setter
 @Getter
-public class LectureDto {
+public class LecturePostDto {
 
-    @JsonProperty("date")
+    @NotNull(message = "local date should be not blank")
+    @JsonProperty("localDate")
     private LocalDate localDate;
 
     @JsonProperty("courseId")
@@ -18,10 +20,5 @@ public class LectureDto {
 
     @JsonProperty("audienceId")
     private Long audienceId;
-
-//    public void setCourse(CourseDto course) {
-//        this.course = course;
-//        course.getLectures().add(this);
-//    }
 
 }

@@ -1,7 +1,9 @@
 package com.staffsterr2000.studentschedulerest.controller;
 
-import com.staffsterr2000.studentschedulerest.dto.LectureDto;
-import com.staffsterr2000.studentschedulerest.dto.StudentDto;
+import com.staffsterr2000.studentschedulerest.dto.get.LectureGetDto;
+import com.staffsterr2000.studentschedulerest.dto.get.StudentGetDto;
+import com.staffsterr2000.studentschedulerest.dto.post.LecturePostDto;
+import com.staffsterr2000.studentschedulerest.dto.post.StudentPostDto;
 import com.staffsterr2000.studentschedulerest.model.service.StudentService;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,11 +22,11 @@ public class ScheduleController {
 
     @GetMapping("/{id}")
     @ResponseBody
-    public List<LectureDto> getStudentLectures(
+    public List<LectureGetDto> getStudentLectures(
             @PathVariable("id") Long id,
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
-        StudentDto student = studentService.getStudentById(id);
+        StudentGetDto student = studentService.getStudentById(id);
         return studentService.getStudentScheduleByDate(student, date);
     }
 

@@ -1,4 +1,4 @@
-package com.staffsterr2000.studentschedulerest.dto;
+package com.staffsterr2000.studentschedulerest.dto.get;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -13,13 +13,13 @@ public class LectureGetDto {
     @JsonProperty("id")
     private Long id;
 
-    @JsonProperty("date")
+    @JsonProperty("localDate")
     private LocalDate localDate;
 
     @JsonProperty("course")
-    private CourseDto course;
+    private CourseGetDto course;
 
     @JsonProperty("audience")
-    private AudienceDto audience;
+    private AudienceGetDto audience;
 
 }
