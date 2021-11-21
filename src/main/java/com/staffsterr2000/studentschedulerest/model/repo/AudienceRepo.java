@@ -11,4 +11,6 @@ public interface AudienceRepo extends JpaRepository<Audience, Long> {
 
     Optional<Audience> findByRoomNumber(Integer roomNumber);
 
+    boolean existsByRoomNumber(Integer roomNumber);
+
 }

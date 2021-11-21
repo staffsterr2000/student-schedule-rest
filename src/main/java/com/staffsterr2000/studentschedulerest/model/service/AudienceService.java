@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,13 +30,13 @@ public class AudienceService {
 
     public AudienceGetDto getAudienceById(Long id) {
         Audience audienceById = audienceRepository.findById(id).
-                orElseThrow(() -> new IllegalStateException(String.format("No such auditory with %d id.", id)));
+                orElseThrow(() -> new IllegalStateException(String.format("No such audience with %d id.", id)));
         return convertToAudienceDto(audienceById);
     }
 
     public AudienceGetDto getAudienceByRoomNumber(Integer roomNumber) {
         Audience audienceByRoomNumber = audienceRepository.findByRoomNumber(roomNumber).
-                orElseThrow(() -> new IllegalStateException(String.format("No such auditory with %d room number.", roomNumber)));
+                orElseThrow(() -> new IllegalStateException(String.format("No such audience with %d room number.", roomNumber)));
         return convertToAudienceDto(audienceByRoomNumber);
     }
 
@@ -49,7 +50,7 @@ public class AudienceService {
     public Long createAudience(AudiencePostDto audiencePostDto) {
         Integer audienceRoomNumber = audiencePostDto.getRoomNumber();
         boolean audienceExists = audienceRepository
-                .findByRoomNumber(audienceRoomNumber).isPresent();
+                .existsByRoomNumber(audienceRoomNumber);
 
         if (audienceExists) {
             throw new IllegalStateException(
@@ -62,15 +63,27 @@ public class AudienceService {
                 .getId();
     }
 
-//    public void updateAudience(Long audienceId, Audience modifiedAudience) {
-//        boolean audienceExists =
-//                audienceRepository.existsById(audienceId);
-//
-//        if (audienceExists) {
-//            modifiedAudience.setId(audienceId);
-//            audienceRepository.save(modifiedAudience);
-//        }
-//    }
+    @Transactional
+    public void updateAudience(Long audienceId, AudiencePostDto audiencePostDto) {
+        Integer audienceRoomNumber = audiencePostDto.getRoomNumber();
+        boolean audienceExists = audienceRepository
+                .existsByRoomNumber(audienceRoomNumber);
+        if (audienceExists) {
+            throw new IllegalStateException(
+                    String.format("Audience with room number %d already exists", audienceRoomNumber)
+            );
+        }
+
+        Audience audienceFromDb = audienceRepository.findById(audienceId)
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("Audience with id %d doesn't exist", audienceId)
+                ));
+
+        if (audienceRoomNumber != null) {
+            audienceFromDb.setRoomNumber(audienceRoomNumber);
+        }
+
+    }
 
     @Transactional
     public void deleteAudience(Long audienceId) {

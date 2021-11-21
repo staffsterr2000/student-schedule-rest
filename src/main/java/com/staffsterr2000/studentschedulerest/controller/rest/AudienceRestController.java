@@ -55,6 +55,16 @@ public class AudienceRestController {
         );
     }
 
+    @PutMapping("/{id}")
+    public void updateAudience(
+            @PathVariable("id") Long audienceId,
+            @RequestBody AudiencePostDto audiencePostDto) {
+
+        audienceService.updateAudience(audienceId, audiencePostDto);
+
+    }
+
+
 //    @PutMapping("/{id}")
 //    public void updateAudience(
 //            @PathVariable("id") Long audienceId,
