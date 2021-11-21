@@ -2,6 +2,7 @@ package com.staffsterr2000.studentschedulerest.controller.rest;
 
 import com.staffsterr2000.studentschedulerest.dto.get.CourseGetDto;
 import com.staffsterr2000.studentschedulerest.dto.post.CoursePostDto;
+import com.staffsterr2000.studentschedulerest.entity.Course;
 import com.staffsterr2000.studentschedulerest.model.service.CourseService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/course")
@@ -25,18 +27,21 @@ public class CourseRestController {
     @GetMapping("/{id}")
     @ResponseBody
     public CourseGetDto getCourseById(@PathVariable("id") Long courseId) {
-        return courseService.getCourseById(courseId);
+        Course courseById = courseService.getCourseById(courseId);
+        return courseService.convertToCourseDto(courseById);
     }
 
     @GetMapping
     @ResponseBody
     public List<CourseGetDto> getCourses() {
-        return courseService.getCourses();
+        return courseService.getCourses().stream()
+                .map(courseService::convertToCourseDto)
+                .collect(Collectors.toList());
     }
 
     @PostMapping
     public ResponseEntity<Object> createCourse(
-            @Valid @RequestBody CoursePostDto course, BindingResult result) {
+            @Valid @RequestBody CoursePostDto coursePostDto, BindingResult result) {
 
         if (result.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
@@ -48,11 +53,23 @@ public class CourseRestController {
             return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
         }
 
-        Long createdCourseId = courseService.createCourse(course);
+        Course course = courseService.convertToCourse(coursePostDto);
+        Course createdCourse = courseService.createCourse(course);
+
         return new ResponseEntity<>(
-                String.format("Successfully created course with id %d", createdCourseId),
+                courseService.convertToCourseDto(createdCourse),
                 HttpStatus.CREATED
         );
+    }
+
+    @PutMapping("/{id}")
+    public void updateCourse(
+            @PathVariable("id") Long courseId,
+            @RequestBody CoursePostDto coursePostDto) {
+
+        Course course = courseService.convertToCourse(coursePostDto);
+        courseService.updateCourse(courseId, course);
+
     }
 
     @DeleteMapping("/{id}")

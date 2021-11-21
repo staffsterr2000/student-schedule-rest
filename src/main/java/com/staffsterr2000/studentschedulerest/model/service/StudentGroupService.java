@@ -4,6 +4,8 @@ import com.staffsterr2000.studentschedulerest.dto.get.CourseGetDto;
 import com.staffsterr2000.studentschedulerest.dto.get.StudentGetDto;
 import com.staffsterr2000.studentschedulerest.dto.get.StudentGroupGetDto;
 import com.staffsterr2000.studentschedulerest.dto.post.StudentGroupPostDto;
+import com.staffsterr2000.studentschedulerest.entity.Course;
+import com.staffsterr2000.studentschedulerest.entity.Student;
 import com.staffsterr2000.studentschedulerest.entity.StudentGroup;
 import com.staffsterr2000.studentschedulerest.model.repo.StudentGroupRepo;
 import org.modelmapper.ModelMapper;
@@ -35,32 +37,28 @@ public class StudentGroupService {
         this.modelMapper = modelMapper;
     }
 
-    public StudentGroupGetDto getStudentGroupById(Long studentGroupId) {
-        StudentGroup studentGroupById = studentGroupRepository.findById(studentGroupId).
+    public StudentGroup getStudentGroupById(Long studentGroupId) {
+        return studentGroupRepository.findById(studentGroupId).
                 orElseThrow(() -> new IllegalStateException(
                         String.format("No such student group with %d id.", studentGroupId)));
-        return convertToStudentGroupDto(studentGroupById);
     }
 
-    public List<StudentGroupGetDto> getStudentGroups() {
-        return studentGroupRepository.findAll().stream()
-                .map(this::convertToStudentGroupDto)
-                .collect(Collectors.toList());
+    public List<StudentGroup> getStudentGroups() {
+        return studentGroupRepository.findAll();
     }
 
     @Transactional
-    public Long createStudentGroup(StudentGroupPostDto studentGroupPostDto) {
-        String groupName = studentGroupPostDto.getName();
+    public StudentGroup createStudentGroup(StudentGroup studentGroup) {
+        String studentGroupName = studentGroup.getName();
         boolean groupNameAlreadyTaken = studentGroupRepository
-                .findByName(groupName).isPresent();
+                .findByName(studentGroupName).isPresent();
 
         if (groupNameAlreadyTaken) {
             throw new IllegalStateException(
-                    String.format("Group name \"%s\" has already been taken.", groupName));
+                    String.format("Group name \"%s\" has already been taken.", studentGroupName));
         }
 
-        StudentGroup studentGroup = convertToStudentGroup(studentGroupPostDto);
-        return studentGroupRepository.save(studentGroup).getId();
+        return studentGroupRepository.save(studentGroup);
     }
 
     @Transactional
@@ -76,49 +74,41 @@ public class StudentGroupService {
         studentGroupRepository.deleteById(studentGroupId);
     }
 
-    private StudentGroupGetDto convertToStudentGroupDto(StudentGroup studentGroup) {
+    public StudentGroupGetDto convertToStudentGroupDto(StudentGroup studentGroup) {
         return modelMapper.map(studentGroup, StudentGroupGetDto.class);
     }
 
-    private StudentGroup convertToStudentGroup(StudentGroupPostDto studentGroupPostDto) {
-        StudentGroupGetDto studentGroupGetDto =
-                transformAndFetchAllStudentGroupDataToDto(studentGroupPostDto);
-
-        return modelMapper.map(studentGroupGetDto, StudentGroup.class);
-    }
-
-    private StudentGroupGetDto transformAndFetchAllStudentGroupDataToDto(
-            StudentGroupPostDto studentGroupPostDto) {
-
-        StudentGroupGetDto studentGroupGetDto = new StudentGroupGetDto();
-        studentGroupGetDto.setName(studentGroupPostDto.getName());
+    public StudentGroup convertToStudentGroup(StudentGroupPostDto studentGroupPostDto) {
+        StudentGroup studentGroup = new StudentGroup();
+        studentGroup.setName(studentGroupPostDto.getName());
 
         List<Long> studentIds = studentGroupPostDto.getStudentIds();
         if (studentIds != null) {
-            List<StudentGetDto> studentGetDtos = studentIds.stream()
+            List<Student> students = studentIds.stream()
                     .map(studentService::getStudentById)
                     .collect(Collectors.toList());
 
-            studentGroupGetDto.setStudents(studentGetDtos);
+            studentGroup.setStudents(students);
 
-            studentGetDtos.forEach(studentGetDto ->
-                    studentGetDto.setStudentGroup(studentGroupGetDto));
+//            students.forEach(student ->
+//                    student.setStudentGroup(studentGroup));
         }
 
         List<Long> courseIds = studentGroupPostDto.getCourseIds();
         if (courseIds != null) {
-            List<CourseGetDto> courseGetDtos = courseIds.stream()
+            List<Course> courses = courseIds.stream()
                     .map(courseService::getCourseById)
                     .collect(Collectors.toList());
 
-            studentGroupGetDto.setCourses(courseGetDtos);
+            studentGroup.setCourses(courses);
 
-            courseGetDtos.stream()
-                    .map(CourseGetDto::getStudentGroups)
-                    .forEach(list -> list.add(studentGroupGetDto));
+//            courses.stream()
+//                    .map(Course::getStudentGroups)
+//                    .forEach(list -> list.add(studentGroup));
         }
 
-        return studentGroupGetDto;
+        return studentGroup;
+
     }
 
 }

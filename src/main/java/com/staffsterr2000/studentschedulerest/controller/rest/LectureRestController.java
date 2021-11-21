@@ -2,6 +2,7 @@ package com.staffsterr2000.studentschedulerest.controller.rest;
 
 import com.staffsterr2000.studentschedulerest.dto.post.LecturePostDto;
 import com.staffsterr2000.studentschedulerest.dto.get.LectureGetDto;
+import com.staffsterr2000.studentschedulerest.entity.Lecture;
 import com.staffsterr2000.studentschedulerest.model.service.LectureService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/lecture")
@@ -25,18 +27,21 @@ public class LectureRestController {
     @GetMapping("/{id}")
     @ResponseBody
     public LectureGetDto getLectureById(@PathVariable("id") Long lectureId) {
-        return lectureService.getLectureById(lectureId);
+        Lecture lectureById = lectureService.getLectureById(lectureId);
+        return lectureService.convertToLectureDto(lectureById);
     }
 
     @GetMapping
     @ResponseBody
     public List<LectureGetDto> getLectures() {
-        return lectureService.getLectures();
+        return lectureService.getLectures().stream()
+                .map(lectureService::convertToLectureDto)
+                .collect(Collectors.toList());
     }
 
     @PostMapping
     public ResponseEntity<Object> createLecture(
-            @Valid @RequestBody LecturePostDto lecture, BindingResult result) {
+            @Valid @RequestBody LecturePostDto lecturePostDto, BindingResult result) {
 
         if (result.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
@@ -48,9 +53,10 @@ public class LectureRestController {
             return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
         }
 
-        Long createdLectureId = lectureService.createLecture(lecture);
+        Lecture lecture = lectureService.convertToLecture(lecturePostDto);
+        Lecture createdLecture= lectureService.createLecture(lecture);
         return new ResponseEntity<>(
-                String.format("Successfully created lecture with id %d", createdLectureId),
+                lectureService.convertToLectureDto(createdLecture),
                 HttpStatus.CREATED
         );
     }

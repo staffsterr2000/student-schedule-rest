@@ -5,8 +5,9 @@ import com.staffsterr2000.studentschedulerest.dto.get.LectureGetDto;
 import com.staffsterr2000.studentschedulerest.dto.get.StudentGroupGetDto;
 import com.staffsterr2000.studentschedulerest.dto.post.CoursePostDto;
 import com.staffsterr2000.studentschedulerest.entity.Course;
+import com.staffsterr2000.studentschedulerest.entity.Lecture;
+import com.staffsterr2000.studentschedulerest.entity.StudentGroup;
 import com.staffsterr2000.studentschedulerest.model.repo.CourseRepo;
-import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -36,28 +37,43 @@ public class CourseService {
         this.modelMapper = modelMapper;
     }
 
-    public CourseGetDto getCourseById(Long courseId) {
-        Course courseById = courseRepository.findById(courseId)
+    public Course getCourseById(Long courseId) {
+        return courseRepository.findById(courseId)
                 .orElseThrow(() -> new IllegalStateException(String.format("No such course with %d id.", courseId)));
-        return convertToCourseDto(courseById);
     }
 
-    public List<CourseGetDto> getCourses() {
-        return courseRepository.findAll().stream()
-                .map(this::convertToCourseDto)
-                .collect(Collectors.toList());
+    public List<Course> getCourses() {
+        return courseRepository.findAll();
     }
 
     @Transactional
-    public Long createCourse(CoursePostDto coursePostDto) {
-        Course course = convertToCourse(coursePostDto);
-        return courseRepository.save(course).getId();
+    public Course createCourse(Course course) {
+        return courseRepository.save(course);
+    }
+
+    @Transactional
+    public void updateCourse(Long courseId, Course course) {
+//        Course courseFromDb = courseRepository.findById(courseId)
+//                .orElseThrow(() -> new IllegalStateException(
+//                        String.format("Course with id %d doesn't exist", courseId)
+//                ));
+//
+//        Course.Subject subject = coursePostDto.getSubject();
+//        if (subject != null) {
+//            courseFromDb.setSubject(subject);
+//        }
+//
+//        String teacherFullName = coursePostDto.getTeacherFullName();
+//        if (teacherFullName != null && !teacherFullName.isEmpty()) {
+//            courseFromDb.setTeacherFullName(teacherFullName);
+//        }
+//
+//        List<Student> students = coursePostDto.get
     }
 
     @Transactional
     public void deleteCourse(Long courseId) {
-        boolean courseExists =
-                courseRepository.existsById(courseId);
+        boolean courseExists = courseRepository.existsById(courseId);
 
         if (!courseExists) {
             throw new IllegalStateException(String.format("Course with id %d doesn't exist", courseId));
@@ -68,49 +84,38 @@ public class CourseService {
 
 
 
-    private CourseGetDto convertToCourseDto(Course course) {
+    public CourseGetDto convertToCourseDto(Course course) {
         return modelMapper.map(course, CourseGetDto.class);
     }
 
-    private Course convertToCourse(CoursePostDto coursePostDto) {
-        CourseGetDto courseGetDto =
-                transformAndFetchAllCourseDataToDto(coursePostDto);
-
-        return modelMapper.map(courseGetDto, Course.class);
-    }
-
-    private CourseGetDto transformAndFetchAllCourseDataToDto(
-            CoursePostDto coursePostDto) {
-
-        CourseGetDto courseGetDto = new CourseGetDto();
-        courseGetDto.setSubject(coursePostDto.getSubject());
-        courseGetDto.setTeacherFullName(coursePostDto.getTeacherFullName());
+    public Course convertToCourse(CoursePostDto coursePostDto) {
+        Course course = new Course();
+        course.setSubject(coursePostDto.getSubject());
+        course.setTeacherFullName(coursePostDto.getTeacherFullName());
 
         List<Long> lectureIds = coursePostDto.getLectureIds();
         if (lectureIds != null) {
-            List<LectureGetDto> lectureGetDtos = lectureIds.stream()
+            List<Lecture> lectures = lectureIds.stream()
                     .map(lectureService::getLectureById)
                     .collect(Collectors.toList());
-
-            courseGetDto.setLectures(lectureGetDtos);
+            course.setLectures(lectures);
         }
 
         List<Long> studentGroupIds = coursePostDto.getStudentGroupIds();
         if (studentGroupIds != null) {
-            List<StudentGroupGetDto> studentGroupGetDtos = studentGroupIds.stream()
+            List<StudentGroup> studentGroups = studentGroupIds.stream()
                     .map(studentGroupService::getStudentGroupById)
                     .collect(Collectors.toList());
-
-            courseGetDto.setStudentGroups(studentGroupGetDtos);
+            course.setStudentGroups(studentGroups);
 
             // added
-            studentGroupGetDtos.stream()
-                    .map(StudentGroupGetDto::getCourses)
-                    .forEach(list -> list.add(courseGetDto));
+            studentGroups.stream()
+                    .map(StudentGroup::getCourses)
+                    .forEach(list -> list.add(course));
 
         }
 
-        return courseGetDto;
+        return course;
     }
 
 }

@@ -2,6 +2,7 @@ package com.staffsterr2000.studentschedulerest.controller.rest;
 
 import com.staffsterr2000.studentschedulerest.dto.get.StudentGetDto;
 import com.staffsterr2000.studentschedulerest.dto.post.StudentPostDto;
+import com.staffsterr2000.studentschedulerest.entity.Student;
 import com.staffsterr2000.studentschedulerest.model.service.StudentService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/student")
@@ -25,18 +27,21 @@ public class StudentRestController {
     @GetMapping("/{id}")
     @ResponseBody
     public StudentGetDto getStudentById(@PathVariable("id") Long studentId) {
-        return studentService.getStudentById(studentId);
+        Student studentById = studentService.getStudentById(studentId);
+        return studentService.convertToStudentDto(studentById);
     }
 
     @GetMapping
     @ResponseBody
     public List<StudentGetDto> getStudents() {
-        return studentService.getStudents();
+        return studentService.getStudents().stream()
+                .map(studentService::convertToStudentDto)
+                .collect(Collectors.toList());
     }
 
     @PostMapping
     public ResponseEntity<Object> createStudent(
-            @Valid @RequestBody StudentPostDto student, BindingResult result) {
+            @Valid @RequestBody StudentPostDto studentPostDto, BindingResult result) {
 
         if (result.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
@@ -48,9 +53,11 @@ public class StudentRestController {
             return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
         }
 
-        Long createdStudentId = studentService.createStudent(student);
+
+        Student student = studentService.convertToStudent(studentPostDto);
+        Student createdStudent = studentService.createStudent(student);
         return new ResponseEntity<>(
-                String.format("Successfully created audition with id %d", createdStudentId),
+                studentService.convertToStudentDto(createdStudent),
                 HttpStatus.CREATED
         );
     }

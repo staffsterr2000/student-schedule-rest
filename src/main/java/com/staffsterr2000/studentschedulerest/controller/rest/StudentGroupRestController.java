@@ -2,6 +2,7 @@ package com.staffsterr2000.studentschedulerest.controller.rest;
 
 import com.staffsterr2000.studentschedulerest.dto.get.StudentGroupGetDto;
 import com.staffsterr2000.studentschedulerest.dto.post.StudentGroupPostDto;
+import com.staffsterr2000.studentschedulerest.entity.StudentGroup;
 import com.staffsterr2000.studentschedulerest.model.service.StudentGroupService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/sgroup")
@@ -25,18 +27,22 @@ public class StudentGroupRestController {
     @GetMapping("/{id}")
     @ResponseBody
     public StudentGroupGetDto getStudentGroupById(@PathVariable("id") Long studentGroupId) {
-        return studentGroupService.getStudentGroupById(studentGroupId);
+        StudentGroup studentGroupById = studentGroupService
+                .getStudentGroupById(studentGroupId);
+        return studentGroupService.convertToStudentGroupDto(studentGroupById);
     }
 
     @GetMapping
     @ResponseBody
     public List<StudentGroupGetDto> getStudentGroups() {
-        return studentGroupService.getStudentGroups();
+        return studentGroupService.getStudentGroups().stream()
+                .map(studentGroupService::convertToStudentGroupDto)
+                .collect(Collectors.toList());
     }
 
     @PostMapping
     public ResponseEntity<Object> createStudentGroup(
-            @Valid @RequestBody StudentGroupPostDto studentGroup, BindingResult result) {
+            @Valid @RequestBody StudentGroupPostDto studentGroupPostDto, BindingResult result) {
 
         if (result.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
@@ -48,9 +54,11 @@ public class StudentGroupRestController {
             return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
         }
 
-        Long createdStudentGroupId = studentGroupService.createStudentGroup(studentGroup);
+
+        StudentGroup studentGroup = studentGroupService.convertToStudentGroup(studentGroupPostDto);
+        StudentGroup createdStudentGroup = studentGroupService.createStudentGroup(studentGroup);
         return new ResponseEntity<>(
-                String.format("Successfully created group with id %d", createdStudentGroupId),
+                studentGroupService.convertToStudentGroupDto(createdStudentGroup),
                 HttpStatus.CREATED
         );
     }

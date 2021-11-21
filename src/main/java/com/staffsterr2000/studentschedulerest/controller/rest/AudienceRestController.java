@@ -2,6 +2,7 @@ package com.staffsterr2000.studentschedulerest.controller.rest;
 
 import com.staffsterr2000.studentschedulerest.dto.get.AudienceGetDto;
 import com.staffsterr2000.studentschedulerest.dto.post.AudiencePostDto;
+import com.staffsterr2000.studentschedulerest.entity.Audience;
 import com.staffsterr2000.studentschedulerest.model.service.AudienceService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/audience")
@@ -25,18 +27,22 @@ public class AudienceRestController {
     @GetMapping("/{id}")
     @ResponseBody
     public AudienceGetDto getAudienceById(@PathVariable("id") Long audienceId) {
-        return audienceService.getAudienceById(audienceId);
+        Audience audienceById = audienceService
+                .getAudienceById(audienceId);
+        return audienceService.convertToAudienceDto(audienceById);
     }
 
     @GetMapping
     @ResponseBody
     public List<AudienceGetDto> getAudiences() {
-        return audienceService.getAudiences();
+        return audienceService.getAudiences().stream()
+                .map(audienceService::convertToAudienceDto)
+                .collect(Collectors.toList());
     }
 
     @PostMapping
     public ResponseEntity<Object> createAudience(
-            @Valid @RequestBody AudiencePostDto audience, BindingResult result) {
+            @Valid @RequestBody AudiencePostDto audiencePostDto, BindingResult result) {
 
         if (result.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
@@ -48,9 +54,11 @@ public class AudienceRestController {
             return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
         }
 
-        Long createdAudienceId = audienceService.createAudience(audience);
+        Audience audience = audienceService.convertToAudience(audiencePostDto);
+        Audience createdAudience = audienceService.createAudience(audience);
+
         return new ResponseEntity<>(
-                String.format("Successfully created audience with id %d", createdAudienceId),
+                audienceService.convertToAudienceDto(createdAudience),
                 HttpStatus.CREATED
         );
     }
@@ -60,7 +68,8 @@ public class AudienceRestController {
             @PathVariable("id") Long audienceId,
             @RequestBody AudiencePostDto audiencePostDto) {
 
-        audienceService.updateAudience(audienceId, audiencePostDto);
+        Audience audience = audienceService.convertToAudience(audiencePostDto);
+        audienceService.updateAudience(audienceId, audience);
 
     }
 

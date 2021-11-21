@@ -4,6 +4,8 @@ import com.staffsterr2000.studentschedulerest.dto.get.AudienceGetDto;
 import com.staffsterr2000.studentschedulerest.dto.get.CourseGetDto;
 import com.staffsterr2000.studentschedulerest.dto.get.LectureGetDto;
 import com.staffsterr2000.studentschedulerest.dto.post.LecturePostDto;
+import com.staffsterr2000.studentschedulerest.entity.Audience;
+import com.staffsterr2000.studentschedulerest.entity.Course;
 import com.staffsterr2000.studentschedulerest.entity.Lecture;
 import com.staffsterr2000.studentschedulerest.model.repo.LectureRepo;
 import lombok.AllArgsConstructor;
@@ -36,22 +38,18 @@ public class LectureService {
         this.modelMapper = modelMapper;
     }
 
-    public LectureGetDto getLectureById(Long lectureId) {
-        Lecture lectureById = lectureRepository.findById(lectureId)
+    public Lecture getLectureById(Long lectureId) {
+        return lectureRepository.findById(lectureId)
                 .orElseThrow(() -> new IllegalStateException(String.format("No such lecture with %d id.", lectureId)));
-        return convertToLectureDto(lectureById);
     }
 
-    public List<LectureGetDto> getLectures() {
-        return lectureRepository.findAll().stream()
-                .map(this::convertToLectureDto)
-                .collect(Collectors.toList());
+    public List<Lecture> getLectures() {
+        return lectureRepository.findAll();
     }
 
     @Transactional
-    public Long createLecture(LecturePostDto lecturePostDto) {
-        Lecture lecture = convertToLecture(lecturePostDto);
-        return lectureRepository.save(lecture).getId();
+    public Lecture createLecture(Lecture lecture) {
+        return lectureRepository.save(lecture);
     }
 
     @Transactional
@@ -68,35 +66,28 @@ public class LectureService {
 
 
 
-    private LectureGetDto convertToLectureDto(Lecture lecture) {
+    public LectureGetDto convertToLectureDto(Lecture lecture) {
         return modelMapper.map(lecture, LectureGetDto.class);
     }
 
-    private Lecture convertToLecture(LecturePostDto lecturePostDto) {
-        LectureGetDto lectureGetDto =
-                transformAndFetchAllLectureDataToDto(lecturePostDto);
+    public Lecture convertToLecture(LecturePostDto lecturePostDto) {
+        Lecture lecture = new Lecture();
 
-        return modelMapper.map(lectureGetDto, Lecture.class);
-    }
-
-    private LectureGetDto transformAndFetchAllLectureDataToDto(LecturePostDto lecturePostDto) {
-        LectureGetDto lectureGetDto = new LectureGetDto();
-
-        lectureGetDto.setLocalDate(lecturePostDto.getLocalDate());
+        lecture.setLocalDate(lecturePostDto.getLocalDate());
 
         Long audienceId = lecturePostDto.getAudienceId();
         if (audienceId != null) {
-            AudienceGetDto audienceGetDto = audienceService.getAudienceById(audienceId);
-            lectureGetDto.setAudience(audienceGetDto);
+            Audience audience = audienceService.getAudienceById(audienceId);
+            lecture.setAudience(audience);
         }
 
         Long courseId = lecturePostDto.getCourseId();
         if (courseId != null) {
-            CourseGetDto courseGetDto = courseService.getCourseById(courseId);
-            lectureGetDto.setCourse(courseGetDto);
+            Course course = courseService.getCourseById(courseId);
+            lecture.setCourse(course);
         }
 
-        return lectureGetDto;
+        return lecture;
     }
 
 }

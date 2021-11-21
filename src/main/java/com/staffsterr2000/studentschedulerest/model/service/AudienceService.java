@@ -4,15 +4,12 @@ import com.staffsterr2000.studentschedulerest.dto.get.AudienceGetDto;
 import com.staffsterr2000.studentschedulerest.dto.post.AudiencePostDto;
 import com.staffsterr2000.studentschedulerest.entity.Audience;
 import com.staffsterr2000.studentschedulerest.model.repo.AudienceRepo;
-import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class AudienceService {
@@ -28,27 +25,23 @@ public class AudienceService {
         this.modelMapper = modelMapper;
     }
 
-    public AudienceGetDto getAudienceById(Long id) {
-        Audience audienceById = audienceRepository.findById(id).
-                orElseThrow(() -> new IllegalStateException(String.format("No such audience with %d id.", id)));
-        return convertToAudienceDto(audienceById);
+    public Audience getAudienceById(Long id) {
+        return audienceRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException(String.format("No such audience with %d id.", id)));
     }
 
-    public AudienceGetDto getAudienceByRoomNumber(Integer roomNumber) {
-        Audience audienceByRoomNumber = audienceRepository.findByRoomNumber(roomNumber).
+    public Audience getAudienceByRoomNumber(Integer roomNumber) {
+        return audienceRepository.findByRoomNumber(roomNumber).
                 orElseThrow(() -> new IllegalStateException(String.format("No such audience with %d room number.", roomNumber)));
-        return convertToAudienceDto(audienceByRoomNumber);
     }
 
-    public List<AudienceGetDto> getAudiences() {
-        return audienceRepository.findAll().stream()
-                .map(this::convertToAudienceDto)
-                .collect(Collectors.toList());
+    public List<Audience> getAudiences() {
+        return audienceRepository.findAll();
     }
 
     @Transactional
-    public Long createAudience(AudiencePostDto audiencePostDto) {
-        Integer audienceRoomNumber = audiencePostDto.getRoomNumber();
+    public Audience createAudience(Audience audience) {
+        Integer audienceRoomNumber = audience.getRoomNumber();
         boolean audienceExists = audienceRepository
                 .existsByRoomNumber(audienceRoomNumber);
 
@@ -58,14 +51,12 @@ public class AudienceService {
             );
         }
 
-        Audience audience = convertToAudience(audiencePostDto);
-        return audienceRepository.save(audience)
-                .getId();
+        return audienceRepository.save(audience);
     }
 
     @Transactional
-    public void updateAudience(Long audienceId, AudiencePostDto audiencePostDto) {
-        Integer audienceRoomNumber = audiencePostDto.getRoomNumber();
+    public void updateAudience(Long audienceId, Audience audience) {
+        Integer audienceRoomNumber = audience.getRoomNumber();
         boolean audienceExists = audienceRepository
                 .existsByRoomNumber(audienceRoomNumber);
         if (audienceExists) {
@@ -97,11 +88,11 @@ public class AudienceService {
         audienceRepository.deleteById(audienceId);
     }
 
-    private AudienceGetDto convertToAudienceDto(Audience audience) {
+    public AudienceGetDto convertToAudienceDto(Audience audience) {
         return modelMapper.map(audience, AudienceGetDto.class);
     }
 
-    private Audience convertToAudience(AudiencePostDto audiencePostDto) {
+    public Audience convertToAudience(AudiencePostDto audiencePostDto) {
         return modelMapper.map(audiencePostDto, Audience.class);
     }
 

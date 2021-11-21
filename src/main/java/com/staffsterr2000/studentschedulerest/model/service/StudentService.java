@@ -4,7 +4,9 @@ import com.staffsterr2000.studentschedulerest.dto.get.LectureGetDto;
 import com.staffsterr2000.studentschedulerest.dto.get.StudentGetDto;
 import com.staffsterr2000.studentschedulerest.dto.get.StudentGroupGetDto;
 import com.staffsterr2000.studentschedulerest.dto.post.StudentPostDto;
+import com.staffsterr2000.studentschedulerest.entity.Lecture;
 import com.staffsterr2000.studentschedulerest.entity.Student;
+import com.staffsterr2000.studentschedulerest.entity.StudentGroup;
 import com.staffsterr2000.studentschedulerest.model.repo.StudentRepo;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,22 +35,18 @@ public class StudentService {
         this.modelMapper = modelMapper;
     }
 
-    public List<StudentGetDto> getStudents() {
-        return studentRepository.findAll().stream()
-                .map(this::convertToStudentDto)
-                .collect(Collectors.toList());
+    public List<Student> getStudents() {
+        return studentRepository.findAll();
     }
 
-    public StudentGetDto getStudentById(Long studentId) {
-        Student studentById = studentRepository.findById(studentId)
+    public Student getStudentById(Long studentId) {
+        return studentRepository.findById(studentId)
                 .orElseThrow(() -> new IllegalStateException(String.format("No such student with %d id.", studentId)));
-        return convertToStudentDto(studentById);
     }
 
     @Transactional
-    public Long createStudent(StudentPostDto studentPostDto) {
-        Student student = convertToStudent(studentPostDto);
-        return studentRepository.save(student).getId();
+    public Student createStudent(Student student) {
+        return studentRepository.save(student);
     }
 
 
@@ -77,38 +75,32 @@ public class StudentService {
         studentRepository.deleteById(studentId);
     }
 
-    public List<LectureGetDto> getStudentScheduleByDate(StudentGetDto student, LocalDate date) {
+    public List<Lecture> getStudentScheduleByDate(Student student, LocalDate date) {
         return student.getStudentGroup().getCourses().stream()
                 .flatMap(course -> course.getLectures().stream())
                 .filter(lecture -> lecture.getLocalDate().isEqual(date))
                 .collect(Collectors.toList());
     }
 
-    private StudentGetDto convertToStudentDto(Student student) {
+    public StudentGetDto convertToStudentDto(Student student) {
         return modelMapper.map(student, StudentGetDto.class);
     }
 
-    private Student convertToStudent(StudentPostDto studentPostDto) {
-        StudentGetDto studentGetDto =
-                transformAndFetchAllStudentDataToDto(studentPostDto);
+    public Student convertToStudent(StudentPostDto studentPostDto) {
+        Student student = new Student();
 
-        return modelMapper.map(studentGetDto, Student.class);
-    }
-
-    private StudentGetDto transformAndFetchAllStudentDataToDto(StudentPostDto studentPostDto) {
-        StudentGetDto studentGetDto = new StudentGetDto();
-
-        studentGetDto.setFirstName(studentPostDto.getFirstName());
-        studentGetDto.setLastName(studentPostDto.getLastName());
+        student.setFirstName(studentPostDto.getFirstName());
+        student.setLastName(studentPostDto.getLastName());
 
         Long studentGroupId = studentPostDto.getStudentGroupId();
         if (studentGroupId != null) {
-            StudentGroupGetDto studentGroupGetDto = studentGroupService
+            StudentGroup studentGroup = studentGroupService
                     .getStudentGroupById(studentGroupId);
-            studentGetDto.setStudentGroup(studentGroupGetDto);
+            student.setStudentGroup(studentGroup);
 //            studentGroupGetDto.getStudents().add(studentGetDto);
         }
 
-        return studentGetDto;
+        return student;
     }
+
 }
