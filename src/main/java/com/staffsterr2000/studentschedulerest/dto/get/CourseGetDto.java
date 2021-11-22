@@ -21,7 +21,6 @@ public class CourseGetDto {
     @JsonProperty("teacherFullName")
     private String teacherFullName;
 
-    // to rethink
     @JsonIgnore
     private List<LectureGetDto> lectures;
 

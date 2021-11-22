@@ -64,23 +64,18 @@ public class AudienceRestController {
     }
 
     @PutMapping("/{id}")
-    public void updateAudience(
+    public ResponseEntity<AudienceGetDto> updateAudience(
             @PathVariable("id") Long audienceId,
             @RequestBody AudiencePostDto audiencePostDto) {
 
         Audience audience = audienceService.convertToAudience(audiencePostDto);
-        audienceService.updateAudience(audienceId, audience);
+        Audience updatedAudience = audienceService.updateAudience(audienceId, audience);
 
+        return new ResponseEntity<>(
+                audienceService.convertToAudienceDto(updatedAudience),
+                HttpStatus.OK
+        );
     }
-
-
-//    @PutMapping("/{id}")
-//    public void updateAudience(
-//            @PathVariable("id") Long audienceId,
-//            @RequestParam(required = false, name = "room") Integer audienceRoomNumber) {
-//
-//        audienceService.updateAudience(audienceId, audience);
-//    }
 
     @DeleteMapping("/{id}")
     public void deleteAudience(@PathVariable("id") Long audienceId) {

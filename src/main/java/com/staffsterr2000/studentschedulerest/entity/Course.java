@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -41,6 +40,7 @@ public class Course {
             strategy = GenerationType.SEQUENCE,
             generator = SEQUENCE_NAME
     )
+    @EqualsAndHashCode.Exclude
     private Long id;
 
     @NotNull

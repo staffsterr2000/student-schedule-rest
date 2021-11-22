@@ -55,10 +55,11 @@ public class AudienceService {
     }
 
     @Transactional
-    public void updateAudience(Long audienceId, Audience audience) {
+    public Audience updateAudience(Long audienceId, Audience audience) {
         Integer audienceRoomNumber = audience.getRoomNumber();
         boolean audienceExists = audienceRepository
                 .existsByRoomNumber(audienceRoomNumber);
+
         if (audienceExists) {
             throw new IllegalStateException(
                     String.format("Audience with room number %d already exists", audienceRoomNumber)
@@ -74,15 +75,18 @@ public class AudienceService {
             audienceFromDb.setRoomNumber(audienceRoomNumber);
         }
 
+        return audienceRepository.save(audienceFromDb);
     }
 
+    // TODO: implement logic
     @Transactional
     public void deleteAudience(Long audienceId) {
         boolean audienceExists =
                 audienceRepository.existsById(audienceId);
 
         if (!audienceExists) {
-            throw new IllegalStateException(String.format("Audience with id %d doesn't exist", audienceId));
+            throw new IllegalStateException(
+                    String.format("Audience with id %d doesn't exist", audienceId));
         }
 
         audienceRepository.deleteById(audienceId);

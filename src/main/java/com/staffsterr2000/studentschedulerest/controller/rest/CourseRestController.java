@@ -62,8 +62,6 @@ public class CourseRestController {
         );
     }
 
-
-    // check for exception with ID out of bounds
     @PutMapping("/{id}")
     public ResponseEntity<CourseGetDto> updateCourse(
             @PathVariable("id") Long courseId,

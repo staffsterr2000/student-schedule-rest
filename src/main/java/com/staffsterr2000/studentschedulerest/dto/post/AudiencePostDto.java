@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 public class AudiencePostDto {
 
     @NotNull(message = "room number should be not null")
-    @Digits(integer = 3, fraction = 0, message = "room number must be unique and only with 3 digits")
+//    @Digits(integer = 3, fraction = 0, message = "room number must be unique and only with 3 digits")
     @JsonProperty("roomNumber")
     private Integer roomNumber;
 

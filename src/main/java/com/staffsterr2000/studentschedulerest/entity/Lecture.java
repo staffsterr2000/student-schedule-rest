@@ -2,6 +2,7 @@ package com.staffsterr2000.studentschedulerest.entity;
 
 import com.sun.istack.NotNull;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -32,6 +33,7 @@ public class Lecture {
             strategy = GenerationType.SEQUENCE,
             generator = SEQUENCE_NAME
     )
+    @EqualsAndHashCode.Exclude
     private Long id;
 
     @ManyToOne
