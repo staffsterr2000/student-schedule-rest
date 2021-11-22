@@ -2,9 +2,12 @@ package com.staffsterr2000.studentschedulerest.entity;
 
 import com.sun.istack.NotNull;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -38,6 +41,8 @@ public class StudentGroup {
     private String name;
 
     @OneToMany(mappedBy = "studentGroup")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Student> students;
 
     @ManyToMany

@@ -61,6 +61,21 @@ public class LectureRestController {
         );
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<LectureGetDto> updateLecture(
+            @PathVariable("id") Long lectureId,
+            @RequestBody LecturePostDto lecturePostDto) {
+
+        Lecture lecture = lectureService.convertToLecture(lecturePostDto);
+        Lecture updatedLecture = lectureService.updateLecture(lectureId, lecture);
+
+        return new ResponseEntity<>(
+                lectureService.convertToLectureDto(updatedLecture),
+                HttpStatus.OK
+        );
+
+    }
+
     @DeleteMapping("/{id}")
     public void deleteLecture(@PathVariable("id") Long lectureId) {
         lectureService.deleteLecture(lectureId);

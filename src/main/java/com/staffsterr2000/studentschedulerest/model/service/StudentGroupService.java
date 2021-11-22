@@ -1,7 +1,5 @@
 package com.staffsterr2000.studentschedulerest.model.service;
 
-import com.staffsterr2000.studentschedulerest.dto.get.CourseGetDto;
-import com.staffsterr2000.studentschedulerest.dto.get.StudentGetDto;
 import com.staffsterr2000.studentschedulerest.dto.get.StudentGroupGetDto;
 import com.staffsterr2000.studentschedulerest.dto.post.StudentGroupPostDto;
 import com.staffsterr2000.studentschedulerest.entity.Course;
@@ -14,7 +12,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,15 +50,68 @@ public class StudentGroupService {
     @Transactional
     public StudentGroup createStudentGroup(StudentGroup studentGroup) {
         String studentGroupName = studentGroup.getName();
-        boolean groupNameAlreadyTaken = studentGroupRepository
-                .findByName(studentGroupName).isPresent();
+        boolean studentGroupNameExists = studentGroupRepository
+                .existsByName(studentGroupName);
 
-        if (groupNameAlreadyTaken) {
+        if (studentGroupNameExists) {
             throw new IllegalStateException(
                     String.format("Group name \"%s\" has already been taken.", studentGroupName));
         }
 
-        return studentGroupRepository.save(studentGroup);
+        StudentGroup savedStudentGroup = studentGroupRepository.save(studentGroup);
+
+        List<Student> students = savedStudentGroup.getStudents();
+        if (students != null) {
+            students.forEach(student -> student.setStudentGroup(savedStudentGroup));
+        }
+
+        List<Course> courses = savedStudentGroup.getCourses();
+        if (courses != null) {
+            courses.stream()
+                    .map(Course::getStudentGroups)
+                    .filter(Objects::nonNull)
+                    .forEach(list -> list.add(savedStudentGroup));
+        }
+
+        return savedStudentGroup;
+    }
+
+    @Transactional
+    public StudentGroup updateStudentGroup(Long studentGroupId, StudentGroup modifiedStudentGroup) {
+        StudentGroup studentGroupFromDb = studentGroupRepository.findById(studentGroupId)
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("Student group with id %d doesn't exist", studentGroupId)
+                ));
+
+        String modifiedName = modifiedStudentGroup.getName();
+        if (modifiedName != null && !modifiedName.isEmpty()) {
+            studentGroupFromDb.setName(modifiedName);
+        }
+
+        List<Student> modifiedStudents = modifiedStudentGroup.getStudents();
+        if (modifiedStudents != null) {
+            studentGroupFromDb.setStudents(modifiedStudents);
+
+            modifiedStudents.forEach(student ->
+                    student.setStudentGroup(studentGroupFromDb));
+        }
+
+        List<Course> modifiedCourses = modifiedStudentGroup.getCourses();
+        if (modifiedCourses != null) {
+            studentGroupFromDb.setCourses(modifiedCourses);
+
+            modifiedCourses.stream()
+                    .map(Course::getStudentGroups)
+                    .filter(Objects::isNull)
+                    .forEach(list -> list = new ArrayList<>());
+
+            modifiedCourses.stream()
+                    .map(Course::getStudentGroups)
+                    .filter(list -> !list.contains(studentGroupFromDb))
+                    .forEach(list -> list.add(studentGroupFromDb));
+        }
+
+        return studentGroupRepository.save(studentGroupFromDb);
     }
 
     @Transactional
@@ -89,9 +142,6 @@ public class StudentGroupService {
                     .collect(Collectors.toList());
 
             studentGroup.setStudents(students);
-
-//            students.forEach(student ->
-//                    student.setStudentGroup(studentGroup));
         }
 
         List<Long> courseIds = studentGroupPostDto.getCourseIds();
@@ -101,10 +151,6 @@ public class StudentGroupService {
                     .collect(Collectors.toList());
 
             studentGroup.setCourses(courses);
-
-//            courses.stream()
-//                    .map(Course::getStudentGroups)
-//                    .forEach(list -> list.add(studentGroup));
         }
 
         return studentGroup;

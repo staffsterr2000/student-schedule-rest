@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,27 +42,58 @@ public class StudentService {
 
     public Student getStudentById(Long studentId) {
         return studentRepository.findById(studentId)
-                .orElseThrow(() -> new IllegalStateException(String.format("No such student with %d id.", studentId)));
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("No such student with %d id.", studentId)));
     }
 
     @Transactional
     public Student createStudent(Student student) {
-        return studentRepository.save(student);
+        Student savedStudent = studentRepository.save(student);
+
+        StudentGroup studentGroup = savedStudent.getStudentGroup();
+        if (studentGroup != null) {
+            List<Student> students = studentGroup.getStudents();
+            if (students == null)
+                students = new ArrayList<>();
+
+            students.add(savedStudent);
+        }
+
+        return savedStudent;
     }
 
+    @Transactional
+    public Student updateStudent(Long studentId, Student modifiedStudent) {
+        Student studentFromDb = studentRepository.findById(studentId)
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("Student with id %d doesn't exist", studentId)
+                ));
 
-//    @SuppressWarnings("UnusedReturnValue")
-//    public boolean updateStudent(Long studentId, Student modifiedStudent) {
-//        boolean audienceIsPresent =
-//                studentRepository.existsById(studentId);
-//
-//        if (audienceIsPresent) {
-//            audience.setId(studentId);
-//            audienceRepository.save(audience);
-//        }
-//
-//        return audienceIsPresent;
-//    }
+        String modifiedFirstName = modifiedStudent.getFirstName();
+        if (modifiedFirstName != null && !modifiedFirstName.isEmpty()) {
+            studentFromDb.setFirstName(modifiedFirstName);
+        }
+
+        String modifiedLastName = modifiedStudent.getLastName();
+        if (modifiedLastName != null && !modifiedLastName.isEmpty()) {
+            studentFromDb.setLastName(modifiedLastName);
+        }
+
+        StudentGroup modifiedStudentGroup = modifiedStudent.getStudentGroup();
+        if (modifiedStudentGroup != null) {
+            studentFromDb.setStudentGroup(modifiedStudentGroup);
+
+            List<Student> students = modifiedStudentGroup.getStudents();
+            if (students == null)
+                students = new ArrayList<>();
+
+            if (!students.contains(studentFromDb))
+                students.add(studentFromDb);
+        }
+
+        return studentRepository.save(studentFromDb);
+
+    }
 
     @Transactional
     public void deleteStudent(Long studentId) {
@@ -88,7 +120,6 @@ public class StudentService {
 
     public Student convertToStudent(StudentPostDto studentPostDto) {
         Student student = new Student();
-
         student.setFirstName(studentPostDto.getFirstName());
         student.setLastName(studentPostDto.getLastName());
 
@@ -96,8 +127,8 @@ public class StudentService {
         if (studentGroupId != null) {
             StudentGroup studentGroup = studentGroupService
                     .getStudentGroupById(studentGroupId);
+
             student.setStudentGroup(studentGroup);
-//            studentGroupGetDto.getStudents().add(studentGetDto);
         }
 
         return student;

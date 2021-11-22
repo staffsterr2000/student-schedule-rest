@@ -62,6 +62,20 @@ public class StudentRestController {
         );
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<StudentGetDto> updateStudent(
+            @PathVariable("id") Long studentId,
+            @RequestBody StudentPostDto studentPostDto) {
+
+        Student student = studentService.convertToStudent(studentPostDto);
+        Student updatedStudent = studentService.updateStudent(studentId, student);
+
+        return new ResponseEntity<>(
+                studentService.convertToStudentDto(updatedStudent),
+                HttpStatus.OK
+        );
+    }
+
     @DeleteMapping("/{id}")
     public void deleteStudent(@PathVariable("id") Long studentId) {
         studentService.deleteStudent(studentId);

@@ -1,8 +1,6 @@
 package com.staffsterr2000.studentschedulerest.model.service;
 
 import com.staffsterr2000.studentschedulerest.dto.get.CourseGetDto;
-import com.staffsterr2000.studentschedulerest.dto.get.LectureGetDto;
-import com.staffsterr2000.studentschedulerest.dto.get.StudentGroupGetDto;
 import com.staffsterr2000.studentschedulerest.dto.post.CoursePostDto;
 import com.staffsterr2000.studentschedulerest.entity.Course;
 import com.staffsterr2000.studentschedulerest.entity.Lecture;
@@ -14,7 +12,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,27 +48,68 @@ public class CourseService {
 
     @Transactional
     public Course createCourse(Course course) {
-        return courseRepository.save(course);
+        Course savedCourse = courseRepository.save(course);
+
+        List<Lecture> lectures = savedCourse.getLectures();
+        if (lectures != null) {
+            lectures.forEach(lecture -> lecture.setCourse(savedCourse));
+        }
+
+        List<StudentGroup> studentGroups = savedCourse.getStudentGroups();
+        if (studentGroups != null) {
+            studentGroups.stream()
+                    .map(StudentGroup::getCourses)
+                    .filter(Objects::nonNull)
+                    .forEach(list -> list.add(savedCourse));
+        }
+
+        return savedCourse;
     }
 
     @Transactional
-    public void updateCourse(Long courseId, Course course) {
-//        Course courseFromDb = courseRepository.findById(courseId)
-//                .orElseThrow(() -> new IllegalStateException(
-//                        String.format("Course with id %d doesn't exist", courseId)
-//                ));
-//
-//        Course.Subject subject = coursePostDto.getSubject();
-//        if (subject != null) {
-//            courseFromDb.setSubject(subject);
-//        }
-//
-//        String teacherFullName = coursePostDto.getTeacherFullName();
-//        if (teacherFullName != null && !teacherFullName.isEmpty()) {
-//            courseFromDb.setTeacherFullName(teacherFullName);
-//        }
-//
-//        List<Student> students = coursePostDto.get
+    public Course updateCourse(Long courseId, Course modifiedCourse) {
+        Course courseFromDb = courseRepository.findById(courseId)
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("Course with id %d doesn't exist", courseId)
+                ));
+
+        Course.Subject modifiedSubject = modifiedCourse.getSubject();
+        if (modifiedSubject != null) {
+            courseFromDb.setSubject(modifiedSubject);
+        }
+
+        String modifiedTeacherFullName = modifiedCourse.getTeacherFullName();
+        if (modifiedTeacherFullName != null && !modifiedTeacherFullName.isEmpty()) {
+            courseFromDb.setTeacherFullName(modifiedTeacherFullName);
+        }
+
+        List<StudentGroup> modifiedStudentGroups = modifiedCourse.getStudentGroups();
+        if (modifiedStudentGroups != null) {
+            courseFromDb.setStudentGroups(modifiedStudentGroups);
+
+            // creates new array list for every course with null
+            modifiedStudentGroups.stream()
+                    .map(StudentGroup::getCourses)
+                    .filter(Objects::isNull)
+                    .forEach(list -> list = new ArrayList<>());
+
+            // adds the course to every group (not rewrites)
+            modifiedStudentGroups.stream()
+                    .map(StudentGroup::getCourses)
+                    .filter(list -> !list.contains(courseFromDb))
+                    .forEach(list -> list.add(courseFromDb));
+
+        }
+
+        List<Lecture> modifiedLectures = modifiedCourse.getLectures();
+        if (modifiedLectures != null) {
+            courseFromDb.setLectures(modifiedLectures);
+
+            modifiedLectures.forEach(lecture ->
+                    lecture.setCourse(courseFromDb));
+        }
+
+        return courseRepository.save(courseFromDb);
     }
 
     @Transactional
@@ -98,6 +139,7 @@ public class CourseService {
             List<Lecture> lectures = lectureIds.stream()
                     .map(lectureService::getLectureById)
                     .collect(Collectors.toList());
+
             course.setLectures(lectures);
         }
 
@@ -106,13 +148,8 @@ public class CourseService {
             List<StudentGroup> studentGroups = studentGroupIds.stream()
                     .map(studentGroupService::getStudentGroupById)
                     .collect(Collectors.toList());
+
             course.setStudentGroups(studentGroups);
-
-            // added
-            studentGroups.stream()
-                    .map(StudentGroup::getCourses)
-                    .forEach(list -> list.add(course));
-
         }
 
         return course;

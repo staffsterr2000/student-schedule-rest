@@ -1,13 +1,14 @@
 package com.staffsterr2000.studentschedulerest.entity;
 
 import com.sun.istack.NotNull;
-import lombok.*;
-import org.hibernate.annotations.Cascade;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
-
-import static org.hibernate.annotations.CascadeType.ALL;
 
 @Entity
 @Data
@@ -50,9 +51,13 @@ public class Course {
     private String teacherFullName;
 
     @OneToMany(mappedBy = "course")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Lecture> lectures;
 
     @ManyToMany(mappedBy = "courses")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<StudentGroup> studentGroups;
 
 }

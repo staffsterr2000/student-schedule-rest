@@ -62,13 +62,20 @@ public class CourseRestController {
         );
     }
 
+
+    // check for exception with ID out of bounds
     @PutMapping("/{id}")
-    public void updateCourse(
+    public ResponseEntity<CourseGetDto> updateCourse(
             @PathVariable("id") Long courseId,
             @RequestBody CoursePostDto coursePostDto) {
 
         Course course = courseService.convertToCourse(coursePostDto);
-        courseService.updateCourse(courseId, course);
+        Course updatedCourse = courseService.updateCourse(courseId, course);
+
+        return new ResponseEntity<>(
+                courseService.convertToCourseDto(updatedCourse),
+                HttpStatus.OK
+        );
 
     }
 

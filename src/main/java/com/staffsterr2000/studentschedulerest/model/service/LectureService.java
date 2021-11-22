@@ -15,6 +15,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,7 +51,55 @@ public class LectureService {
 
     @Transactional
     public Lecture createLecture(Lecture lecture) {
-        return lectureRepository.save(lecture);
+        Lecture savedLecture = lectureRepository.save(lecture);
+
+        Course course = savedLecture.getCourse();
+        if (course != null) {
+            List<Lecture> lectures = course.getLectures();
+            if (lectures == null)
+                lectures = new ArrayList<>();
+
+            lectures.add(savedLecture);
+        }
+
+        return savedLecture;
+    }
+
+    @Transactional
+    public Lecture updateLecture(Long lectureId, Lecture modifiedLecture) {
+        Lecture lectureFromDb = lectureRepository.findById(lectureId)
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("Lecture with id %d doesn't exist", lectureId)
+                ));
+
+        LocalDate modifiedDate = modifiedLecture.getLocalDate();
+        if (modifiedDate != null) {
+            if (!modifiedDate.isAfter(LocalDate.now())) {
+                throw new IllegalStateException("Day of the lecture must be at least tomorrow.");
+            }
+
+            lectureFromDb.setLocalDate(modifiedDate);
+        }
+
+        Course modifiedCourse = modifiedLecture.getCourse();
+        if (modifiedCourse != null) {
+            lectureFromDb.setCourse(modifiedCourse);
+
+            List<Lecture> lectures = modifiedCourse.getLectures();
+            if (lectures == null)
+                lectures = new ArrayList<>();
+
+            if (!lectures.contains(lectureFromDb))
+                lectures.add(lectureFromDb);
+        }
+
+        Audience modifiedAudience = modifiedLecture.getAudience();
+        if (modifiedAudience != null) {
+            lectureFromDb.setAudience(modifiedAudience);
+        }
+
+        return lectureRepository.save(lectureFromDb);
+
     }
 
     @Transactional
@@ -72,7 +122,6 @@ public class LectureService {
 
     public Lecture convertToLecture(LecturePostDto lecturePostDto) {
         Lecture lecture = new Lecture();
-
         lecture.setLocalDate(lecturePostDto.getLocalDate());
 
         Long audienceId = lecturePostDto.getAudienceId();
@@ -84,6 +133,7 @@ public class LectureService {
         Long courseId = lecturePostDto.getCourseId();
         if (courseId != null) {
             Course course = courseService.getCourseById(courseId);
+
             lecture.setCourse(course);
         }
 

@@ -93,7 +93,10 @@ public class AudienceService {
     }
 
     public Audience convertToAudience(AudiencePostDto audiencePostDto) {
-        return modelMapper.map(audiencePostDto, Audience.class);
+        Audience audience = new Audience();
+        audience.setRoomNumber(audiencePostDto.getRoomNumber());
+
+        return audience;
     }
 
 }

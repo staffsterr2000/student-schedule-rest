@@ -55,11 +55,30 @@ public class StudentGroupRestController {
         }
 
 
-        StudentGroup studentGroup = studentGroupService.convertToStudentGroup(studentGroupPostDto);
-        StudentGroup createdStudentGroup = studentGroupService.createStudentGroup(studentGroup);
+        StudentGroup studentGroup = studentGroupService
+                .convertToStudentGroup(studentGroupPostDto);
+        StudentGroup createdStudentGroup = studentGroupService
+                .createStudentGroup(studentGroup);
+
         return new ResponseEntity<>(
                 studentGroupService.convertToStudentGroupDto(createdStudentGroup),
                 HttpStatus.CREATED
+        );
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<StudentGroupGetDto> updateStudentGroup(
+            @PathVariable("id") Long studentGroupId,
+            @RequestBody StudentGroupPostDto studentGroupPostDto) {
+
+        StudentGroup studentGroup = studentGroupService
+                .convertToStudentGroup(studentGroupPostDto);
+        StudentGroup updatedStudentGroup = studentGroupService
+                .updateStudentGroup(studentGroupId, studentGroup);
+
+        return new ResponseEntity<>(
+                studentGroupService.convertToStudentGroupDto(updatedStudentGroup),
+                HttpStatus.OK
         );
     }
 
