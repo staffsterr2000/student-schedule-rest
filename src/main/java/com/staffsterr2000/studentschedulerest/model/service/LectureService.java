@@ -15,6 +15,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class LectureService {
@@ -129,6 +130,7 @@ public class LectureService {
 
     public void deleteAudienceFromLectures(Audience audience) {
         getLectures().stream()
+                .filter(lecture -> lecture.getAudience() != null)
                 .filter(lecture -> lecture.getAudience().equals(audience))
                 .forEach(lecture -> lecture.setAudience(null));
     }

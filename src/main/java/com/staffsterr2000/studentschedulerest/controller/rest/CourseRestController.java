@@ -78,8 +78,12 @@ public class CourseRestController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteCourse(@PathVariable("id") Long courseId) {
+    public ResponseEntity<HttpStatus> deleteCourse(
+            @PathVariable("id") Long courseId) {
+
         courseService.deleteCourse(courseId);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

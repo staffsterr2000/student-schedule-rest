@@ -77,8 +77,12 @@ public class StudentRestController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteStudent(@PathVariable("id") Long studentId) {
+    public ResponseEntity<HttpStatus> deleteStudent(
+            @PathVariable("id") Long studentId) {
+
         studentService.deleteStudent(studentId);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

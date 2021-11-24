@@ -1,9 +1,10 @@
 package com.staffsterr2000.studentschedulerest.dataseed;
 
-import com.staffsterr2000.studentschedulerest.dto.post.*;
 import com.staffsterr2000.studentschedulerest.entity.*;
 import com.staffsterr2000.studentschedulerest.model.service.*;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -30,8 +31,23 @@ public class DataLoader implements CommandLineRunner {
 
     private final AudienceService audienceService;
 
+    // checks that all tables are empty and that's why the program can load init data.
+    private boolean isAllTablesAreEmpty() {
+        List<Student> students = studentService.getStudents();
+        List<StudentGroup> studentGroups = studentGroupService.getStudentGroups();
+        List<Course> courses = courseService.getCourses();
+        List<Lecture> lectures = lectureService.getLectures();
+        List<Audience> audiences = audienceService.getAudiences();
+
+        return students.isEmpty() &&
+                studentGroups.isEmpty() && courses.isEmpty() &&
+                lectures.isEmpty() && audiences.isEmpty();
+    }
+
     @Override
     public void run(String... args) throws Exception {
+
+        if (!isAllTablesAreEmpty()) return;
 
         // audiences
         Audience audience112 = new Audience();
@@ -45,7 +61,6 @@ public class DataLoader implements CommandLineRunner {
         Audience audience309 = new Audience();
         audience309.setRoomNumber(309);
         audience309 = audienceService.createAudience(audience309);
-
 
 
         // courses
@@ -68,8 +83,6 @@ public class DataLoader implements CommandLineRunner {
         courseEnglish2.setSubject(ENGLISH);
         courseEnglish2.setTeacherFullName("Jack Rachel");
         courseEnglish2 = courseService.createCourse(courseEnglish2);
-
-
 
 
         // lectures
@@ -128,7 +141,6 @@ public class DataLoader implements CommandLineRunner {
         lecture9 = lectureService.createLecture(lecture9);
 
 
-
         // groups
         StudentGroup studentGroupKN17 = new StudentGroup();
         studentGroupKN17.setName("KN17");
@@ -147,7 +159,6 @@ public class DataLoader implements CommandLineRunner {
         studentGroupAPP17.setCourses(new ArrayList<>(Arrays.asList(courseMath, courseEnglish1)));
         studentGroupAPP17 = studentGroupService
                 .createStudentGroup(studentGroupAPP17);
-
 
 
         // students
@@ -188,5 +199,4 @@ public class DataLoader implements CommandLineRunner {
         studentService.createStudent(student6);
 
     }
-
 }

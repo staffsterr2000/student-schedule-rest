@@ -83,8 +83,12 @@ public class StudentGroupRestController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteStudentGroup(@PathVariable("id") Long studentGroupId) {
+    public ResponseEntity<HttpStatus> deleteStudentGroup(
+            @PathVariable("id") Long studentGroupId) {
+
         studentGroupService.deleteStudentGroup(studentGroupId);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

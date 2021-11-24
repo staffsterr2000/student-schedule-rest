@@ -78,8 +78,12 @@ public class AudienceRestController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteAudience(@PathVariable("id") Long audienceId) {
+    public ResponseEntity<HttpStatus> deleteAudience(
+            @PathVariable("id") Long audienceId) {
+
         audienceService.deleteAudience(audienceId);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }
