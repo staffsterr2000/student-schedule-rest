@@ -119,6 +119,12 @@ class StudentServiceTest {
 
     }
 
+    // TODO: implement working with schedule unit test logic
+    @Test
+    void shouldGiveScheduleBackCorrectly() {
+
+    }
+
     // TODO: implement deletion test logic
     @Test
     void shouldSuccessfullyDeleteEntityFromDb() {

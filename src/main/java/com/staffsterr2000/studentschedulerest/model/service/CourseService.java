@@ -59,6 +59,10 @@ public class CourseService {
         List<StudentGroup> studentGroups = savedCourse.getStudentGroups();
         if (studentGroups != null) {
             studentGroups.stream()
+                    .filter(studentGroup -> studentGroup.getCourses() == null)
+                    .forEach(studentGroup -> studentGroup.setCourses(new ArrayList<>()));
+
+            studentGroups.stream()
                     .map(StudentGroup::getCourses)
                     .forEach(list -> list.add(savedCourse));
         }
@@ -86,6 +90,16 @@ public class CourseService {
         List<StudentGroup> modifiedStudentGroups = modifiedCourse.getStudentGroups();
         if (modifiedStudentGroups != null) {
             courseFromDb.setStudentGroups(modifiedStudentGroups);
+
+            modifiedStudentGroups.stream()
+                    .filter(studentGroup -> studentGroup.getCourses() == null)
+                    .forEach(studentGroup -> studentGroup.setCourses(new ArrayList<>()));
+
+            // not working alternative to ^
+//            modifiedStudentGroups.stream()
+//                    .map(StudentGroup::getCourses)
+//                    .filter(Objects::isNull)
+//                    .forEach(list -> list = new ArrayList<>());
 
             modifiedStudentGroups.stream()
                     .map(StudentGroup::getCourses)

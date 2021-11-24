@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -61,6 +62,8 @@ public class LectureService {
         Course course = savedLecture.getCourse();
         if (course != null) {
             List<Lecture> lectures = course.getLectures();
+            if (lectures == null)
+                lectures = new ArrayList<>();
 
             lectures.add(savedLecture);
         }
@@ -89,6 +92,8 @@ public class LectureService {
             lectureFromDb.setCourse(modifiedCourse);
 
             List<Lecture> lectures = modifiedCourse.getLectures();
+            if (lectures == null)
+                lectures = new ArrayList<>();
 
             if (!lectures.contains(lectureFromDb))
                 lectures.add(lectureFromDb);

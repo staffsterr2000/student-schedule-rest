@@ -6,13 +6,16 @@ import com.staffsterr2000.studentschedulerest.entity.Course;
 import com.staffsterr2000.studentschedulerest.entity.Student;
 import com.staffsterr2000.studentschedulerest.entity.StudentGroup;
 import com.staffsterr2000.studentschedulerest.model.repo.StudentGroupRepo;
+import org.apache.catalina.valves.CrawlerSessionManagerValve;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,8 +72,11 @@ public class StudentGroupService {
         List<Course> courses = savedStudentGroup.getCourses();
         if (courses != null) {
             courses.stream()
+                    .filter(course -> course.getStudentGroups() == null)
+                    .forEach(course -> course.setStudentGroups(new ArrayList<>()));
+
+            courses.stream()
                     .map(Course::getStudentGroups)
-//                    .filter(Objects::nonNull)
                     .forEach(list -> list.add(savedStudentGroup));
         }
 
@@ -109,6 +115,11 @@ public class StudentGroupService {
         if (modifiedCourses != null) {
             studentGroupFromDb.setCourses(modifiedCourses);
 
+            modifiedCourses.stream()
+                    .filter(course -> course.getStudentGroups() == null)
+                    .forEach(course -> course.setStudentGroups(new ArrayList<>()));
+
+            // not working alternative to ^
 //            modifiedCourses.stream()
 //                    .map(Course::getStudentGroups)
 //                    .filter(Objects::isNull)
@@ -118,6 +129,7 @@ public class StudentGroupService {
                     .map(Course::getStudentGroups)
                     .filter(list -> !list.contains(studentGroupFromDb))
                     .forEach(list -> list.add(studentGroupFromDb));
+
         }
 
         return studentGroupRepository.save(studentGroupFromDb);

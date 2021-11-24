@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.staffsterr2000.studentschedulerest.entity.Course.Subject.*;
@@ -130,19 +132,19 @@ public class DataLoader implements CommandLineRunner {
         // groups
         StudentGroup studentGroupKN17 = new StudentGroup();
         studentGroupKN17.setName("KN17");
-        studentGroupKN17.setCourses(List.of(courseHistory, courseEnglish2));
+        studentGroupKN17.setCourses(new ArrayList<>(Arrays.asList(courseHistory, courseEnglish2)));
         studentGroupKN17 = studentGroupService
                 .createStudentGroup(studentGroupKN17);
 
         StudentGroup studentGroupSA17 = new StudentGroup();
         studentGroupSA17.setName("SA17");
-        studentGroupSA17.setCourses(List.of(courseHistory, courseMath));
+        studentGroupSA17.setCourses(new ArrayList<>(Arrays.asList(courseHistory, courseMath)));
         studentGroupSA17 = studentGroupService
                 .createStudentGroup(studentGroupSA17);
 
         StudentGroup studentGroupAPP17 = new StudentGroup();
         studentGroupAPP17.setName("APP17");
-        studentGroupAPP17.setCourses(List.of(courseMath, courseEnglish1));
+        studentGroupAPP17.setCourses(new ArrayList<>(Arrays.asList(courseMath, courseEnglish1)));
         studentGroupAPP17 = studentGroupService
                 .createStudentGroup(studentGroupAPP17);
 

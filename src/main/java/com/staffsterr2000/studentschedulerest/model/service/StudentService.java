@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,8 +53,8 @@ public class StudentService {
         StudentGroup studentGroup = savedStudent.getStudentGroup();
         if (studentGroup != null) {
             List<Student> students = studentGroup.getStudents();
-//            if (students == null)
-//                students = new ArrayList<>();
+            if (students == null)
+                students = new ArrayList<>();
 
             students.add(savedStudent);
         }
@@ -83,8 +84,8 @@ public class StudentService {
             studentFromDb.setStudentGroup(modifiedStudentGroup);
 
             List<Student> students = modifiedStudentGroup.getStudents();
-//            if (students == null)
-//                students = new ArrayList<>();
+            if (students == null)
+                students = new ArrayList<>();
 
             if (!students.contains(studentFromDb))
                 students.add(studentFromDb);
