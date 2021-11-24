@@ -22,6 +22,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 
 @RunWith(SpringRunner.class)
@@ -113,10 +114,10 @@ class LectureServiceTest {
     void shouldSetInverseDependenciesDuringCreating() {
         Lecture lecture = new Lecture();
 
-        Audience audience = new Audience();
-        audience.setId(1L);
-        audience.setRoomNumber(100);
-        lecture.setAudience(audience);
+//        Audience audience = new Audience();
+//        audience.setId(1L);
+//        audience.setRoomNumber(100);
+//        lecture.setAudience(audience);
 
         Course course = new Course();
         course.setId(1L);
@@ -131,7 +132,6 @@ class LectureServiceTest {
 
         lectureService.createLecture(lecture);
 
-        Assertions.assertEquals(audience, lecture.getAudience());
         Assertions.assertTrue(course.getLectures().stream()
                 .anyMatch(lecture::equals));
 
@@ -168,15 +168,69 @@ class LectureServiceTest {
         Assertions.assertEquals(lecture, emptyLecture);
 
         // inverse
-        Assertions.assertEquals(audience, lecture.getAudience());
         Assertions.assertTrue(course.getLectures().stream()
-                .anyMatch(lecture::equals));
+                .anyMatch(emptyLecture::equals));
 
     }
 
-    // TODO: implement deletion test logic
     @Test
-    void shouldSuccessfullyDeleteEntityFromDb() {
+    void shouldUnsetInverseDependenciesDuringDeleting() {
+        Lecture lecture = new Lecture();
+        lecture.setId(1L);
+        lecture.setLocalDate(LocalDate.now().plusDays(1));
+
+        Long id = 1L;
+
+//        Audience audience = new Audience();
+//        audience.setId(1L);
+//        audience.setRoomNumber(100);
+//        lecture.setAudience(audience);
+
+        Course course = new Course();
+        course.setId(1L);
+        course.setSubject(Course.Subject.MATH);
+        course.setTeacherFullName("Alice Alison");
+        course.setLectures(new ArrayList<>(Arrays.asList(lecture, new Lecture())));
+        lecture.setCourse(course);
+
+        Mockito.doReturn(Optional.of(lecture))
+                .when(lectureRepository)
+                .findById(id);
+
+        lectureService.deleteLecture(id);
+
+        Assertions.assertFalse(
+                course.getLectures().contains(lecture)
+        );
+
+    }
+
+    @Test
+    void shouldDeleteAudienceDependencyFromCertainLectures() {
+        Lecture lecture = new Lecture();
+        Audience audience = new Audience();
+        audience.setRoomNumber(100);
+        lecture.setAudience(audience);
+
+        Lecture lectureThatShouldRemainWithAudienceDependency = new Lecture();
+        Audience fakeAudience = new Audience();
+        fakeAudience.setRoomNumber(200);
+        lectureThatShouldRemainWithAudienceDependency.setAudience(fakeAudience);
+
+        Mockito.doReturn(new ArrayList<>(
+                Arrays.asList(lecture, lectureThatShouldRemainWithAudienceDependency)
+        ))
+                .when(lectureRepository)
+                .findAll();
+
+        lectureService.deleteAudienceFromLectures(audience);
+
+        Assertions.assertNull(lecture.getAudience());
+        Assertions.assertEquals(
+                fakeAudience,
+                lectureThatShouldRemainWithAudienceDependency.getAudience()
+        );
+
 
     }
 

@@ -3,6 +3,7 @@ package com.staffsterr2000.studentschedulerest.model.service;
 import com.staffsterr2000.studentschedulerest.dto.get.AudienceGetDto;
 import com.staffsterr2000.studentschedulerest.dto.post.AudiencePostDto;
 import com.staffsterr2000.studentschedulerest.entity.Audience;
+import com.staffsterr2000.studentschedulerest.entity.Lecture;
 import com.staffsterr2000.studentschedulerest.model.repo.AudienceRepo;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
@@ -16,6 +17,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 
 
@@ -32,6 +35,9 @@ class AudienceServiceTest {
 
     @MockBean
     private AudienceRepo audienceRepository;
+
+    @MockBean
+    private LectureService lectureService;
 
     @Test
     void shouldThrowExceptionIfRoomNumberDoesNotExist() {
@@ -114,26 +120,21 @@ class AudienceServiceTest {
     }
 
     @Test
-    void shouldSetAllAudienceFieldsInUpdateMethod() {
+    void shouldSetDirectDependenciesDuringUpdating() {
         Audience audience = new Audience();
-        audience.setId(1L);
         audience.setRoomNumber(100);
 
-        Audience audienceFromDb = new Audience();
+        Long id = 1L;
 
-        Mockito.doReturn(Optional.of(audienceFromDb))
+        Audience emptyAudience = new Audience();
+
+        Mockito.doReturn(Optional.of(emptyAudience))
                 .when(audienceRepository)
-                .findById(audience.getId());
+                .findById(id);
 
-        audienceService.updateAudience(audience.getId(), audience);
+        audienceService.updateAudience(id, audience);
 
-        Assertions.assertEquals(audience, audienceFromDb);
-
-    }
-
-    // TODO: shouldSuccessfullyDeleteEntityFromDb
-    @Test
-    void shouldSuccessfullyDeleteEntityFromDb() {
+        Assertions.assertEquals(audience, emptyAudience);
 
     }
 

@@ -20,10 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
@@ -153,9 +150,42 @@ class CourseServiceTest {
                 .reduce(true, (a, b) -> a && b));
     }
 
-    // TODO: implement deletion test logic
     @Test
-    void shouldSuccessfullyDeleteEntityFromDb() {
+    void shouldUnsetInverseDependenciesDuringDeleting() {
+        Course course = new Course();
+        course.setSubject(Course.Subject.MATH);
+        course.setTeacherFullName("Eric Johnson");
+
+        Long id = 1L;
+
+        Lecture lecture = new Lecture();
+        lecture.setId(1L);
+        lecture.setLocalDate(LocalDate.now().plusDays(1));
+        lecture.setCourse(course);
+        List<Lecture> lectureList = new ArrayList<>(Arrays.asList(lecture));
+        course.setLectures(lectureList);
+
+        StudentGroup studentGroup = new StudentGroup();
+        studentGroup.setId(1L);
+        studentGroup.setName("NL17");
+        studentGroup.setCourses(new ArrayList<>(Arrays.asList(course, new Course())));
+        List<StudentGroup> studentGroupList = new ArrayList<>(Arrays.asList(studentGroup));
+        course.setStudentGroups(studentGroupList);
+
+        Mockito.doReturn(Optional.of(course))
+                .when(courseRepository)
+                .findById(id);
+
+        courseService.deleteCourse(id);
+
+        Assertions.assertTrue(lectureList.stream()
+                .map(Lecture::getCourse)
+                .map(Objects::isNull)
+                .reduce(true, (a, b) -> a && b));
+        Assertions.assertTrue(studentGroupList.stream()
+                .map(StudentGroup::getCourses)
+                .map(list -> !list.contains(course))
+                .reduce(true, (a, b) -> a && b));
 
     }
 

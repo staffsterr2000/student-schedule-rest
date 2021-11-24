@@ -17,7 +17,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 
 @RunWith(SpringRunner.class)
@@ -65,6 +67,12 @@ class StudentServiceTest {
                 () -> studentService.deleteStudent(null));
         Assertions.assertThrows(IllegalStateException.class,
                 () -> studentService.deleteStudent(fakeId));
+
+        // getStudentScheduleByDate method
+        Assertions.assertThrows(IllegalStateException.class,
+                () -> studentService.getStudentScheduleByDate(null, LocalDate.now()));
+        Assertions.assertThrows(IllegalStateException.class,
+                () -> studentService.getStudentScheduleByDate(fakeId, LocalDate.now()));
 
     }
 
@@ -119,16 +127,29 @@ class StudentServiceTest {
 
     }
 
-    // TODO: implement working with schedule unit test logic
     @Test
-    void shouldGiveScheduleBackCorrectly() {
+    void shouldUnsetInverseDependenciesDuringDeleting() {
+        Student student = new Student();
+        student.setFirstName("Abdul");
+        student.setLastName("Ibn");
 
-    }
+        Long id = 1L;
 
-    // TODO: implement deletion test logic
-    @Test
-    void shouldSuccessfullyDeleteEntityFromDb() {
+        StudentGroup studentGroup = new StudentGroup();
+        studentGroup.setId(1L);
+        studentGroup.setName("KIW19-1");
+        studentGroup.setStudents(new ArrayList<>(Arrays.asList(student, new Student())));
+        student.setStudentGroup(studentGroup);
 
+        Mockito.doReturn(Optional.of(student))
+                .when(studentRepository)
+                .findById(id);
+
+        studentService.deleteStudent(id);
+
+        Assertions.assertFalse(
+                studentGroup.getStudents().contains(student)
+        );
     }
 
     @Test

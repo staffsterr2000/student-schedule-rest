@@ -110,15 +110,29 @@ public class LectureService {
 
     @Transactional
     public void deleteLecture(Long lectureId) {
-        boolean lectureExists =
-                lectureRepository.existsById(lectureId);
+        Lecture lectureFromDb = lectureRepository.findById(lectureId)
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("Lecture with id %d doesn't exist", lectureId)
+                ));
 
-        if (!lectureExists) {
-            throw new IllegalStateException(String.format("Lecture with id %d doesn't exist", lectureId));
+        Course course = lectureFromDb.getCourse();
+        if (course != null) {
+            List<Lecture> lectures = course.getLectures();
+            lectures.remove(lectureFromDb);
+            lectureFromDb.setCourse(null);
         }
+
+        lectureFromDb.setAudience(null);
 
         lectureRepository.deleteById(lectureId);
     }
+
+    public void deleteAudienceFromLectures(Audience audience) {
+        getLectures().stream()
+                .filter(lecture -> lecture.getAudience().equals(audience))
+                .forEach(lecture -> lecture.setAudience(null));
+    }
+
 
 
 

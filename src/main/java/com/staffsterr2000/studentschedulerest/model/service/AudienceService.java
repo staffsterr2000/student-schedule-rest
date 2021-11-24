@@ -15,13 +15,18 @@ import java.util.List;
 public class AudienceService {
 
     private final AudienceRepo audienceRepository;
+
+    private final LectureService lectureService;
+
     private final ModelMapper modelMapper;
 
     @Autowired
     public AudienceService(AudienceRepo audienceRepository,
+                           LectureService lectureService,
                            ModelMapper modelMapper) {
 
         this.audienceRepository = audienceRepository;
+        this.lectureService = lectureService;
         this.modelMapper = modelMapper;
     }
 
@@ -78,16 +83,14 @@ public class AudienceService {
         return audienceRepository.save(audienceFromDb);
     }
 
-    // TODO: implement logic
     @Transactional
     public void deleteAudience(Long audienceId) {
-        boolean audienceExists =
-                audienceRepository.existsById(audienceId);
+        Audience audienceFromDb = audienceRepository.findById(audienceId)
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("Audience with id %d doesn't exist", audienceId)
+                ));
 
-        if (!audienceExists) {
-            throw new IllegalStateException(
-                    String.format("Audience with id %d doesn't exist", audienceId));
-        }
+        lectureService.deleteAudienceFromLectures(audienceFromDb);
 
         audienceRepository.deleteById(audienceId);
     }

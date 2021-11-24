@@ -121,14 +121,26 @@ public class CourseService {
 
     @Transactional
     public void deleteCourse(Long courseId) {
-        boolean courseExists = courseRepository.existsById(courseId);
+        Course courseFromDb = courseRepository.findById(courseId)
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("Course with id %d doesn't exist", courseId)
+                ));
 
-        if (!courseExists) {
-            throw new IllegalStateException(
-                    String.format("Course with id %d doesn't exist", courseId));
+        List<StudentGroup> studentGroups = courseFromDb.getStudentGroups();
+        if (studentGroups != null) {
+            studentGroups.stream()
+                    .map(StudentGroup::getCourses)
+                    .forEach(list -> list.remove(courseFromDb));
+            courseFromDb.setStudentGroups(null);
         }
 
-        courseRepository.deleteById(courseId);
+        List<Lecture> lectures = courseFromDb.getLectures();
+        if (lectures != null) {
+            lectures.forEach(lecture -> lecture.setCourse(null));
+            courseFromDb.setLectures(null);
+        }
+
+        courseRepository.delete(courseFromDb);
     }
 
 

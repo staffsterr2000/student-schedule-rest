@@ -19,10 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
@@ -173,10 +170,43 @@ class StudentGroupServiceTest {
 
     }
 
-    // TODO: implement deletion test logic
     @Test
-    void shouldSuccessfullyDeleteEntityFromDb() {
+    void shouldUnsetInverseDependenciesDuringDeleting() {
+        StudentGroup studentGroup = new StudentGroup();
+        studentGroup.setName("KR17-1");
 
+        Long id = 1L;
+
+        Student student = new Student();
+        student.setId(1L);
+        student.setFirstName("Kimoh");
+        student.setLastName("Titatau");
+        student.setStudentGroup(studentGroup);
+        List<Student> studentList = new ArrayList<>(Arrays.asList(student));
+        studentGroup.setStudents(studentList);
+
+        Course course = new Course();
+        course.setId(1L);
+        course.setSubject(Course.Subject.MATH);
+        course.setTeacherFullName("Nowadays Hero");
+        course.setStudentGroups(new ArrayList<>(Arrays.asList(studentGroup, new StudentGroup())));
+        List<Course> courseList = new ArrayList<>(Arrays.asList(course));
+        studentGroup.setCourses(courseList);
+
+        Mockito.doReturn(Optional.of(studentGroup))
+                .when(studentGroupRepository)
+                .findById(id);
+
+        studentGroupService.deleteStudentGroup(id);
+
+        Assertions.assertTrue(studentList.stream()
+                .map(Student::getStudentGroup)
+                .map(Objects::isNull)
+                .reduce(true, (a, b) -> a && b));
+        Assertions.assertTrue(courseList.stream()
+                .map(Course::getStudentGroups)
+                .map(list -> !list.contains(studentGroup))
+                .reduce(true, (a, b) -> a && b));
     }
 
     @Test

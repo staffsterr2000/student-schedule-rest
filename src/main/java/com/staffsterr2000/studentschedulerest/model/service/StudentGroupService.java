@@ -137,15 +137,26 @@ public class StudentGroupService {
 
     @Transactional
     public void deleteStudentGroup(Long studentGroupId) {
-        boolean studentGroupExists =
-                studentGroupRepository.existsById(studentGroupId);
+        StudentGroup studentGroupFromDb = studentGroupRepository.findById(studentGroupId)
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("Student group with id %d doesn't exist", studentGroupId)
+                ));
 
-        if (!studentGroupExists) {
-            throw new IllegalStateException(
-                    String.format("Student group with id %d doesn't exist", studentGroupId));
+        List<Course> courses = studentGroupFromDb.getCourses();
+        if (courses != null) {
+            courses.stream()
+                    .map(Course::getStudentGroups)
+                    .forEach(list -> list.remove(studentGroupFromDb));
+            studentGroupFromDb.setCourses(null);
         }
 
-        studentGroupRepository.deleteById(studentGroupId);
+        List<Student> students = studentGroupFromDb.getStudents();
+        if (students != null) {
+            students.forEach(student -> student.setStudentGroup(null));
+            studentGroupFromDb.setStudents(null);
+        }
+
+        studentGroupRepository.delete(studentGroupFromDb);
     }
 
     public StudentGroupGetDto convertToStudentGroupDto(StudentGroup studentGroup) {

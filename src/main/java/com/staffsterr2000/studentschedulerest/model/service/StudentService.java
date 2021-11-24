@@ -97,18 +97,27 @@ public class StudentService {
 
     @Transactional
     public void deleteStudent(Long studentId) {
-        boolean studentExists =
-                studentRepository.existsById(studentId);
+        Student studentFromDb = studentRepository.findById(studentId)
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("Student with id %d doesn't exist", studentId)
+                ));
 
-        if (!studentExists) {
-            throw new IllegalStateException(
-                    String.format("Student with id %d doesn't exist", studentId));
+        StudentGroup studentGroup = studentFromDb.getStudentGroup();
+        if (studentGroup != null) {
+            List<Student> students = studentGroup.getStudents();
+            students.remove(studentFromDb);
+            studentFromDb.setStudentGroup(null);
         }
 
         studentRepository.deleteById(studentId);
     }
 
-    public List<Lecture> getStudentScheduleByDate(Student student, LocalDate date) {
+    public List<Lecture> getStudentScheduleByDate(Long studentId, LocalDate date) {
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("Student with id %d doesn't exist", studentId)
+                ));
+
         return student.getStudentGroup().getCourses().stream()
                 .flatMap(course -> course.getLectures().stream())
                 .filter(lecture -> lecture.getLocalDate().isEqual(date))
