@@ -6,9 +6,10 @@ server:
 
 spring:
   datasource:
-    username: postgres
-    password: 258456
-    url: jdbc:postgresql://localhost:5432/student_schedule_db
+    username: ${DATASOURCE_USER:postgres}
+    password: ${DATASOURCE_PASSWORD:258456}
+    url: jdbc:postgresql://${DATASOURCE_HOST:localhost}:${DATASOURCE_PORT:5432}/${DATASOURCE_DB:student_schedule_db}
+#    url: jdbc:postgresql://db:5432/student_schedule_db
 
   jpa:
     hibernate:
