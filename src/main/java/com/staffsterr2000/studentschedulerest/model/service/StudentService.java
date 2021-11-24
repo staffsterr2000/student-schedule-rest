@@ -1,8 +1,6 @@
 package com.staffsterr2000.studentschedulerest.model.service;
 
-import com.staffsterr2000.studentschedulerest.dto.get.LectureGetDto;
 import com.staffsterr2000.studentschedulerest.dto.get.StudentGetDto;
-import com.staffsterr2000.studentschedulerest.dto.get.StudentGroupGetDto;
 import com.staffsterr2000.studentschedulerest.dto.post.StudentPostDto;
 import com.staffsterr2000.studentschedulerest.entity.Lecture;
 import com.staffsterr2000.studentschedulerest.entity.Student;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +20,9 @@ import java.util.stream.Collectors;
 public class StudentService {
 
     private final StudentRepo studentRepository;
+
     private final StudentGroupService studentGroupService;
+
     private final ModelMapper modelMapper;
 
     @Autowired
@@ -53,8 +52,8 @@ public class StudentService {
         StudentGroup studentGroup = savedStudent.getStudentGroup();
         if (studentGroup != null) {
             List<Student> students = studentGroup.getStudents();
-            if (students == null)
-                students = new ArrayList<>();
+//            if (students == null)
+//                students = new ArrayList<>();
 
             students.add(savedStudent);
         }
@@ -84,8 +83,8 @@ public class StudentService {
             studentFromDb.setStudentGroup(modifiedStudentGroup);
 
             List<Student> students = modifiedStudentGroup.getStudents();
-            if (students == null)
-                students = new ArrayList<>();
+//            if (students == null)
+//                students = new ArrayList<>();
 
             if (!students.contains(studentFromDb))
                 students.add(studentFromDb);
@@ -101,7 +100,8 @@ public class StudentService {
                 studentRepository.existsById(studentId);
 
         if (!studentExists) {
-            throw new IllegalStateException(String.format("Student with id %d doesn't exist", studentId));
+            throw new IllegalStateException(
+                    String.format("Student with id %d doesn't exist", studentId));
         }
 
         studentRepository.deleteById(studentId);

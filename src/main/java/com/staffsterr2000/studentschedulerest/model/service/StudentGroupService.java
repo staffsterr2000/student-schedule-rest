@@ -12,17 +12,18 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 public class StudentGroupService {
 
     private final StudentGroupRepo studentGroupRepository;
+
     private final StudentService studentService;
+
     private final CourseService courseService;
+
     private final ModelMapper modelMapper;
 
     @Autowired
@@ -49,13 +50,13 @@ public class StudentGroupService {
 
     @Transactional
     public StudentGroup createStudentGroup(StudentGroup studentGroup) {
-        String studentGroupName = studentGroup.getName();
+        String name = studentGroup.getName();
         boolean studentGroupNameExists = studentGroupRepository
-                .existsByName(studentGroupName);
+                .existsByName(name);
 
         if (studentGroupNameExists) {
             throw new IllegalStateException(
-                    String.format("Group name \"%s\" has already been taken.", studentGroupName));
+                    String.format("Group name \"%s\" has already been taken.", name));
         }
 
         StudentGroup savedStudentGroup = studentGroupRepository.save(studentGroup);
@@ -69,7 +70,7 @@ public class StudentGroupService {
         if (courses != null) {
             courses.stream()
                     .map(Course::getStudentGroups)
-                    .filter(Objects::nonNull)
+//                    .filter(Objects::nonNull)
                     .forEach(list -> list.add(savedStudentGroup));
         }
 
@@ -84,6 +85,14 @@ public class StudentGroupService {
                 ));
 
         String modifiedName = modifiedStudentGroup.getName();
+        boolean modifiedNameExists = studentGroupRepository
+                .existsByName(modifiedName);
+
+        if (modifiedNameExists) {
+            throw new IllegalStateException(
+                    String.format("Group name \"%s\" has already been taken.", modifiedName));
+        }
+
         if (modifiedName != null && !modifiedName.isEmpty()) {
             studentGroupFromDb.setName(modifiedName);
         }
@@ -100,10 +109,10 @@ public class StudentGroupService {
         if (modifiedCourses != null) {
             studentGroupFromDb.setCourses(modifiedCourses);
 
-            modifiedCourses.stream()
-                    .map(Course::getStudentGroups)
-                    .filter(Objects::isNull)
-                    .forEach(list -> list = new ArrayList<>());
+//            modifiedCourses.stream()
+//                    .map(Course::getStudentGroups)
+//                    .filter(Objects::isNull)
+//                    .forEach(list -> list = new ArrayList<>());
 
             modifiedCourses.stream()
                     .map(Course::getStudentGroups)

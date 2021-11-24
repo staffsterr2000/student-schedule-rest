@@ -1,14 +1,11 @@
 package com.staffsterr2000.studentschedulerest.model.service;
 
-import com.staffsterr2000.studentschedulerest.dto.get.AudienceGetDto;
-import com.staffsterr2000.studentschedulerest.dto.get.CourseGetDto;
 import com.staffsterr2000.studentschedulerest.dto.get.LectureGetDto;
 import com.staffsterr2000.studentschedulerest.dto.post.LecturePostDto;
 import com.staffsterr2000.studentschedulerest.entity.Audience;
 import com.staffsterr2000.studentschedulerest.entity.Course;
 import com.staffsterr2000.studentschedulerest.entity.Lecture;
 import com.staffsterr2000.studentschedulerest.model.repo.LectureRepo;
-import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -16,16 +13,17 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class LectureService {
 
     private final LectureRepo lectureRepository;
+
     private final AudienceService audienceService;
+
     private final CourseService courseService;
+
     private final ModelMapper modelMapper;
 
     @Autowired
@@ -51,13 +49,18 @@ public class LectureService {
 
     @Transactional
     public Lecture createLecture(Lecture lecture) {
+        LocalDate localDate = lecture.getLocalDate();
+        if (localDate != null) {
+            if (!localDate.isAfter(LocalDate.now())) {
+                throw new IllegalStateException("Day of the lecture must be at least tomorrow.");
+            }
+        }
+
         Lecture savedLecture = lectureRepository.save(lecture);
 
         Course course = savedLecture.getCourse();
         if (course != null) {
             List<Lecture> lectures = course.getLectures();
-            if (lectures == null)
-                lectures = new ArrayList<>();
 
             lectures.add(savedLecture);
         }
@@ -86,8 +89,6 @@ public class LectureService {
             lectureFromDb.setCourse(modifiedCourse);
 
             List<Lecture> lectures = modifiedCourse.getLectures();
-            if (lectures == null)
-                lectures = new ArrayList<>();
 
             if (!lectures.contains(lectureFromDb))
                 lectures.add(lectureFromDb);

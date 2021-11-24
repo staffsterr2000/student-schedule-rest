@@ -39,7 +39,8 @@ public class CourseService {
 
     public Course getCourseById(Long courseId) {
         return courseRepository.findById(courseId)
-                .orElseThrow(() -> new IllegalStateException(String.format("No such course with %d id.", courseId)));
+                .orElseThrow(() -> new IllegalStateException(
+                        String.format("Course with id %d doesn't exist", courseId)));
     }
 
     public List<Course> getCourses() {
@@ -59,7 +60,6 @@ public class CourseService {
         if (studentGroups != null) {
             studentGroups.stream()
                     .map(StudentGroup::getCourses)
-                    .filter(Objects::nonNull)
                     .forEach(list -> list.add(savedCourse));
         }
 
@@ -87,13 +87,6 @@ public class CourseService {
         if (modifiedStudentGroups != null) {
             courseFromDb.setStudentGroups(modifiedStudentGroups);
 
-            // creates new array list for every course with null
-            modifiedStudentGroups.stream()
-                    .map(StudentGroup::getCourses)
-                    .filter(Objects::isNull)
-                    .forEach(list -> list = new ArrayList<>());
-
-            // adds the course to every group (not rewrites)
             modifiedStudentGroups.stream()
                     .map(StudentGroup::getCourses)
                     .filter(list -> !list.contains(courseFromDb))
@@ -117,7 +110,8 @@ public class CourseService {
         boolean courseExists = courseRepository.existsById(courseId);
 
         if (!courseExists) {
-            throw new IllegalStateException(String.format("Course with id %d doesn't exist", courseId));
+            throw new IllegalStateException(
+                    String.format("Course with id %d doesn't exist", courseId));
         }
 
         courseRepository.deleteById(courseId);

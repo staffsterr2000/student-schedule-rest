@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Optional;
@@ -20,6 +21,7 @@ import java.util.Optional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@ActiveProfiles("test")
 class AudienceServiceTest {
 
     @Autowired
@@ -114,8 +116,8 @@ class AudienceServiceTest {
     @Test
     void shouldSetAllAudienceFieldsInUpdateMethod() {
         Audience audience = new Audience();
-        audience.setRoomNumber(100);
         audience.setId(1L);
+        audience.setRoomNumber(100);
 
         Audience audienceFromDb = new Audience();
 
@@ -128,7 +130,6 @@ class AudienceServiceTest {
         Assertions.assertEquals(audience, audienceFromDb);
 
     }
-
 
     // TODO: shouldSuccessfullyDeleteEntityFromDb
     @Test
@@ -144,7 +145,7 @@ class AudienceServiceTest {
                 .convertToAudienceDto(emptyFieldAudience);
 
         AudiencePostDto emptyAudiencePostDto = new AudiencePostDto();
-        convertAudienceGetDtoToAudiencePostDto(emptyAudienceGetDto, emptyAudiencePostDto);
+        convertAudienceGetDtoToPostDto(emptyAudienceGetDto, emptyAudiencePostDto);
 
         Audience anotherEmptyFieldAudience = audienceService
                 .convertToAudience(emptyAudiencePostDto);
@@ -154,12 +155,14 @@ class AudienceServiceTest {
         // ---------------------------------------------------------------
 
         Audience fullFieldAudience = new Audience();
+        fullFieldAudience.setId(1L);
+        fullFieldAudience.setRoomNumber(100);
 
         AudienceGetDto fullAudienceGetDto = audienceService
                 .convertToAudienceDto(fullFieldAudience);
 
         AudiencePostDto fullAudiencePostDto = new AudiencePostDto();
-        convertAudienceGetDtoToAudiencePostDto(fullAudienceGetDto, fullAudiencePostDto);
+        convertAudienceGetDtoToPostDto(fullAudienceGetDto, fullAudiencePostDto);
 
         Audience anotherFullFieldAudience = audienceService
                 .convertToAudience(fullAudiencePostDto);
@@ -168,13 +171,11 @@ class AudienceServiceTest {
 
     }
 
+    private void convertAudienceGetDtoToPostDto(
+            AudienceGetDto audienceGetDto, AudiencePostDto audiencePostDto) {
 
+        Integer roomNumber = audienceGetDto.getRoomNumber();
+        audiencePostDto.setRoomNumber(roomNumber);
 
-
-    private void convertAudienceGetDtoToAudiencePostDto(
-            AudienceGetDto audienceGetDto,
-            AudiencePostDto audiencePostDto) {
-
-        audiencePostDto.setRoomNumber(audienceGetDto.getRoomNumber());
     }
 }

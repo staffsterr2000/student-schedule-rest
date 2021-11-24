@@ -5,6 +5,7 @@ import com.staffsterr2000.studentschedulerest.entity.*;
 import com.staffsterr2000.studentschedulerest.model.service.*;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ import static com.staffsterr2000.studentschedulerest.entity.Course.Subject.*;
 
 @Component
 @AllArgsConstructor
+@Profile("!test")
 public class DataLoader implements CommandLineRunner {
 
     private final StudentService studentService;
