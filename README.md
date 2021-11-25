@@ -55,7 +55,8 @@ Copy one from the given links, paste values in fields like this {some_id}, choos
 
   * To interact with Schedule:
     - localhost:8080/api/v1/schedule/{student_id}?date={some_date} (GET)
-    - ![Full field Student request example](/images/schedule_link_example.PNG)
+   
+    ![Full field Student request example](/images/schedule_link_example.PNG)
       
 
   * To interact with Student:
@@ -64,7 +65,8 @@ Copy one from the given links, paste values in fields like this {some_id}, choos
     - localhost:8080/api/v1/student/{student_id} (GET)
     - localhost:8080/api/v1/student/{student_id} (DELETE)
     - localhost:8080/api/v1/student/{student_id} (PUT) + BODY
-    - ![Full field Student request example](/images/student_full_fields_example.PNG)
+   
+    ![Full field Student request example](/images/student_full_fields_example.PNG)
    
 
   * To interact with StudentGroup:
@@ -73,7 +75,8 @@ Copy one from the given links, paste values in fields like this {some_id}, choos
     - localhost:8080/api/v1/sgroup/{sgroup_id} (GET)
     - localhost:8080/api/v1/sgroup/{sgroup_id} (DELETE)
     - localhost:8080/api/v1/sgroup/{sgroup_id} (PUT) + BODY
-    - ![Full field StudentGroup request example](/images/sgroup_full_fields_example.PNG)
+    
+    ![Full field StudentGroup request example](/images/sgroup_full_fields_example.PNG)
       
     
   * To interact with Course:
@@ -82,7 +85,8 @@ Copy one from the given links, paste values in fields like this {some_id}, choos
     - localhost:8080/api/v1/course/{course_id} (GET)
     - localhost:8080/api/v1/course/{course_id} (DELETE)
     - localhost:8080/api/v1/course/{course_id} (PUT) + BODY
-    - ![Full field Course request example](/images/course_full_fields_example.PNG)
+   
+    ![Full field Course request example](/images/course_full_fields_example.PNG)
     
 
   * To interact with Lecture:
@@ -91,7 +95,8 @@ Copy one from the given links, paste values in fields like this {some_id}, choos
     - localhost:8080/api/v1/lecture/{lecture_id} (GET)
     - localhost:8080/api/v1/lecture/{lecture_id} (DELETE)
     - localhost:8080/api/v1/lecture/{lecture_id} (PUT) + BODY
-    - ![Full field Lecture request example](/images/lecture_full_fields_example.PNG)
+   
+    ![Full field Lecture request example](/images/lecture_full_fields_example.PNG)
     
 
   * To interact with Audience:
@@ -100,4 +105,5 @@ Copy one from the given links, paste values in fields like this {some_id}, choos
     - localhost:8080/api/v1/audience/{audience_id} (GET)
     - localhost:8080/api/v1/audience/{audience_id} (DELETE)
     - localhost:8080/api/v1/audience/{audience_id} (PUT) + BODY
-    - ![Full field Audience request example](/images/audience_full_fields_example.PNG)
+   
+    ![Full field Audience request example](/images/audience_full_fields_example.PNG)
